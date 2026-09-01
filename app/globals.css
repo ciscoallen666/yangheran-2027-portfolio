@@ -51,7 +51,7 @@
 :root {
   --font-system-sans: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", Arial, Helvetica, sans-serif;
   --font-system-mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --background: oklch(1 0 0);
+  --background: oklch(0.938 0.006 110);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -137,13 +137,71 @@
       "liga" 1;
     text-rendering: optimizeLegibility;
   }
+  body {
+    min-width: 320px;
+    background:
+      radial-gradient(circle at 12% 4%, rgb(255 255 255 / 78%), transparent 30rem),
+      radial-gradient(circle at 88% 16%, rgb(95 111 90 / 18%), transparent 32rem),
+      linear-gradient(135deg, rgb(246 246 243), rgb(224 226 219));
+  }
   a,
   button {
     -webkit-tap-highlight-color: transparent;
   }
   ::selection {
-    background: rgb(40 107 87 / 18%);
+    background: rgb(95 111 90 / 22%);
     color: #191b1f;
+  }
+}
+
+@layer components {
+  .portfolio-shell {
+    position: relative;
+    background:
+      linear-gradient(90deg, rgb(20 20 20 / 3%) 1px, transparent 1px),
+      linear-gradient(0deg, rgb(20 20 20 / 3%) 1px, transparent 1px),
+      radial-gradient(circle at 20% 18%, rgb(255 255 255 / 70%), transparent 28rem),
+      radial-gradient(circle at 82% 8%, rgb(95 111 90 / 16%), transparent 34rem),
+      #e9ebe6;
+    background-size:
+      72px 72px,
+      72px 72px,
+      auto,
+      auto,
+      auto;
+  }
+
+  .portfolio-shell::before {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    content: "";
+    opacity: 0.34;
+    background:
+      radial-gradient(circle at 20% 40%, rgb(255 255 255 / 58%) 0 1px, transparent 1px),
+      radial-gradient(circle at 70% 70%, rgb(0 0 0 / 16%) 0 1px, transparent 1px);
+    background-size:
+      13px 13px,
+      19px 19px;
+    mix-blend-mode: multiply;
+  }
+
+  .portfolio-shell > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .surface-block {
+    box-shadow:
+      0 22px 64px rgb(0 0 0 / 8%),
+      inset 0 1px 0 rgb(255 255 255 / 72%);
+  }
+
+  .portrait-frame {
+    box-shadow:
+      0 28px 80px rgb(0 0 0 / 16%),
+      inset 0 1px 0 rgb(255 255 255 / 48%);
   }
 }
 

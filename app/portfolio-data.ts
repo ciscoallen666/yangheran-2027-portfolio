@@ -16,10 +16,10 @@ export type Project = {
 
 export const profile = {
   name: '杨赫然',
-  title: '文化内容与 AIGC 视觉设计',
+  title: '文化内容 / 文旅文创 / AIGC 视觉',
   subtitle: '文旅文创 / 交互展示 / AI 辅助视觉表达',
   summary:
-    '设计硕士在读，本科数字媒体艺术。作品围绕传统文化转译、文创产品、数字交互展示、视觉物料与手工模型展开，适配 2027 届全职秋招及实习转正机会。',
+    '设计硕士在读，本科数字媒体艺术。作品围绕传统文化转译、文创产品、数字交互展示、视觉物料与手工模型展开。',
   email: 'yangheran20000@163.com',
   location: '意向城市：北上广深优先，西安可沟通',
   graduation: '2027.07 硕士预计毕业',
@@ -38,24 +38,24 @@ export const filters = [
 
 export const fitCards = [
   {
-    title: '文旅文创设计',
-    keywords: '文创产品、IP 衍生品、传统文化转译、礼赠场景',
-    proof: '《珠走迷宫》、马勺脸谱文创、四羊方尊贴花、农产品包装与省级竞赛成果。',
+    title: '文旅文创',
+    keywords: '文化转译 / 产品表达',
+    proof: '瓦当迷宫、马勺脸谱、四羊方尊贴花、农产品包装。',
   },
   {
-    title: 'AIGC 视觉设计',
-    keywords: 'AI 参考生成、Prompt 方向推演、视觉筛选、二次设计',
-    proof: '铜镜交互与四羊方尊项目已有 AI 辅助方案推演、视觉参考和人工重构痕迹。',
+    title: 'AIGC 视觉',
+    keywords: '概念发散 / 视觉重构',
+    proof: '铜镜交互、四羊方尊版花及视觉方案整理。',
   },
   {
-    title: '数字文旅体验',
-    keywords: '交互展示、WebGL、手势识别、H5、文化信息分层',
-    proof: '唐瑞兽葡萄纹铜镜数字交互系统、马勺脸谱 APP、校园 H5。',
+    title: '数字文旅',
+    keywords: '交互展示 / 信息分层',
+    proof: '铜镜数字展示系统、非遗 APP、校园 H5。',
   },
   {
-    title: '视觉物料与动态内容',
-    keywords: '海报、展板、短片、定格动画、PR/AE 输出',
-    proof: '万物的眼、展陈视觉、定格动画与影视后期助理经历。',
+    title: '视觉内容',
+    keywords: '平面物料 / 动态输出',
+    proof: '海报、展陈视觉、定格动画与后期素材。',
   },
 ];
 

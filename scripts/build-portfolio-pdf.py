@@ -5,7 +5,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.utils import ImageReader
@@ -24,16 +24,16 @@ OUTPUT_PDF = OUT_DIR / "YangHeran_Culture_AIGC_Portfolio.pdf"
 PAGE_W, PAGE_H = landscape(A4)
 MARGIN = 42
 
-INK = HexColor("#191b1f")
-MUTED = HexColor("#626872")
-LINE = HexColor("#d8d1c4")
-PAPER = HexColor("#f7f4ee")
+INK = HexColor("#141414")
+TEXT = HexColor("#303030")
+MUTED = HexColor("#6a6a66")
+FAINT = HexColor("#a5a7a0")
+LINE = HexColor("#c9cbc4")
+PAPER = HexColor("#e9ebe6")
+SOFT = HexColor("#f5f5f2")
 WHITE = HexColor("#ffffff")
-GREEN = HexColor("#286b57")
-GREEN_DARK = HexColor("#174a3c")
-RUST = HexColor("#a34d3a")
-BLUE = HexColor("#214f8f")
-GOLD = HexColor("#b5892f")
+GREEN = HexColor("#5f6f5a")
+DARK = HexColor("#101010")
 
 FONT_REGULAR = "DengXian"
 FONT_BOLD = "DengXian-Bold"
@@ -50,9 +50,8 @@ def register_fonts() -> None:
     ]
 
     for font_name, font_path in font_candidates:
-        if not font_path.exists():
-            continue
-        pdfmetrics.registerFont(TTFont(font_name, str(font_path)))
+        if font_path.exists():
+            pdfmetrics.registerFont(TTFont(font_name, str(font_path)))
 
     registered = set(pdfmetrics.getRegisteredFontNames())
     if FONT_REGULAR not in registered or FONT_BOLD not in registered:
@@ -67,7 +66,6 @@ def load_portfolio_data() -> dict:
       const data = {
         profile: mod.profile,
         fitCards: mod.fitCards,
-        workflow: mod.workflow,
         projects: mod.projects,
         resume: mod.resume
       };
@@ -116,7 +114,7 @@ def draw_text(
     font: str = FONT_REGULAR,
     size: float = 10.5,
     leading: float = 16,
-    color=INK,
+    color=TEXT,
     max_lines: int | None = None,
 ) -> float:
     lines = fit_lines(text, font, size, width)
@@ -134,26 +132,33 @@ def draw_text(
     return y
 
 
-def draw_rule(c: canvas.Canvas, y: float, color=LINE) -> None:
-    c.setStrokeColor(color)
-    c.setLineWidth(0.8)
-    c.line(MARGIN, y, PAGE_W - MARGIN, y)
+def draw_texture(c: canvas.Canvas) -> None:
+    c.setStrokeColor(HexColor("#d8d9d4"))
+    c.setLineWidth(0.28)
+    for idx in range(0, 14):
+        y = 48 + idx * 38
+        c.line(MARGIN, y, PAGE_W - MARGIN, y + (idx % 3 - 1) * 4)
+    c.setFillColor(HexColor("#f2f2ee"))
+    c.circle(PAGE_W - 120, PAGE_H - 96, 80, fill=1, stroke=0)
 
 
 def draw_page_base(c: canvas.Canvas, title: str, page_no: int) -> None:
     c.setFillColor(PAPER)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_texture(c)
     c.setFillColor(INK)
     c.setFont(FONT_BOLD, 9)
     c.drawString(MARGIN, PAGE_H - 26, "杨赫然 | 2027 届秋招作品集")
     c.setFillColor(MUTED)
     c.setFont(FONT_REGULAR, 8)
     c.drawRightString(PAGE_W - MARGIN, PAGE_H - 26, f"{title} / {page_no:02d}")
-    draw_rule(c, PAGE_H - 38)
+    c.setStrokeColor(LINE)
+    c.setLineWidth(0.8)
+    c.line(MARGIN, PAGE_H - 38, PAGE_W - MARGIN, PAGE_H - 38)
 
 
-def draw_label(c: canvas.Canvas, text: str, x: float, y: float, color=GREEN) -> None:
-    c.setFillColor(color)
+def draw_label(c: canvas.Canvas, text: str, x: float, y: float) -> None:
+    c.setFillColor(GREEN)
     c.setFont(FONT_BOLD, 9)
     c.drawString(x, y, text.upper())
 
@@ -162,45 +167,81 @@ def draw_title(c: canvas.Canvas, text: str, x: float, y: float, width: float, si
     return draw_text(c, text, x, y, width, font=FONT_BOLD, size=size, leading=size + 5, color=INK)
 
 
-def draw_tag(c: canvas.Canvas, text: str, x: float, y: float, fill=WHITE, stroke=LINE, color=INK) -> float:
+def draw_tag(c: canvas.Canvas, text: str, x: float, y: float, fill=WHITE, stroke=LINE, color=MUTED) -> float:
     c.setFont(FONT_BOLD, 8.5)
     tag_w = pdfmetrics.stringWidth(text, FONT_BOLD, 8.5) + 18
     c.setFillColor(fill)
     c.setStrokeColor(stroke)
-    c.roundRect(x, y - 5, tag_w, 20, 4, fill=1, stroke=1)
+    c.rect(x, y - 5, tag_w, 20, fill=1, stroke=1)
     c.setFillColor(color)
     c.drawString(x + 9, y, text)
     return x + tag_w + 6
 
 
-def draw_card(c: canvas.Canvas, x: float, y: float, w: float, h: float, *, fill=WHITE, stroke=LINE) -> None:
+def draw_block(c: canvas.Canvas, x: float, y: float, w: float, h: float, *, fill=WHITE, stroke=LINE) -> None:
     c.setFillColor(fill)
     c.setStrokeColor(stroke)
-    c.roundRect(x, y, w, h, 6, fill=1, stroke=1)
+    c.rect(x, y, w, h, fill=1, stroke=1)
 
 
-def draw_image(c: canvas.Canvas, src: str, x: float, y: float, w: float, h: float, background=HexColor("#101419")) -> None:
+def prepare_image(path: Path, *, grayscale: bool = True, blur: float = 0) -> Image.Image:
+    image = Image.open(path).convert("RGB")
+    if grayscale:
+        image = ImageOps.grayscale(image).convert("RGB")
+        image = ImageOps.autocontrast(image, cutoff=1)
+        image = ImageEnhance.Contrast(image).enhance(1.06)
+    if blur:
+        image = image.filter(ImageFilter.GaussianBlur(blur))
+    return image
+
+
+def crop_to_aspect(image: Image.Image, aspect: float, *, anchor_x: float = 0.5) -> Image.Image:
+    iw, ih = image.size
+    current = iw / ih
+    if current > aspect:
+        new_w = int(ih * aspect)
+        left = int((iw - new_w) * anchor_x)
+        return image.crop((left, 0, left + new_w, ih))
+    new_h = int(iw / aspect)
+    top = max(0, int((ih - new_h) * 0.35))
+    return image.crop((0, top, iw, top + new_h))
+
+
+def draw_cover_photo(c: canvas.Canvas, x: float, y: float, w: float, h: float) -> None:
+    path = ASSET_DIR / "hero-portrait-wide.webp"
+    draw_block(c, x, y, w, h, fill=HexColor("#d9dbd4"), stroke=HexColor("#d9dbd4"))
+    if not path.exists():
+        return
+    aspect = w / h
+    soft = crop_to_aspect(prepare_image(path, grayscale=True, blur=8), aspect, anchor_x=0.72)
+    sharp = crop_to_aspect(prepare_image(path, grayscale=True), aspect, anchor_x=0.72)
+    c.drawImage(ImageReader(soft), x, y, width=w, height=h, mask=None)
+    c.setFillColor(HexColor("#e9ebe6"))
+    c.rect(x, y, w, h, fill=1, stroke=0)
+    c.saveState()
+    c.setFillAlpha(0.58)
+    c.drawImage(ImageReader(soft), x, y, width=w, height=h, mask=None)
+    c.restoreState()
+    c.saveState()
+    c.setFillAlpha(0.86)
+    c.drawImage(ImageReader(sharp), x, y, width=w, height=h, mask=None)
+    c.restoreState()
+
+
+def draw_image(c: canvas.Canvas, src: str, x: float, y: float, w: float, h: float, background=DARK) -> None:
     path = ASSET_DIR / Path(src).name
-    draw_card(c, x, y, w, h, fill=background, stroke=background)
+    draw_block(c, x, y, w, h, fill=background, stroke=background)
     if not path.exists():
         c.setFillColor(WHITE)
         c.setFont(FONT_BOLD, 10)
         c.drawCentredString(x + w / 2, y + h / 2, "图片缺失")
         return
 
-    with Image.open(path) as image:
-        image = image.convert("RGB")
-        iw, ih = image.size
-        scale = min(w / iw, h / ih)
-        dw, dh = iw * scale, ih * scale
-        c.drawImage(
-            ImageReader(image),
-            x + (w - dw) / 2,
-            y + (h - dh) / 2,
-            width=dw,
-            height=dh,
-            mask=None,
-        )
+    image = prepare_image(path, grayscale=True)
+    iw, ih = image.size
+    scale = min(w / iw, h / ih)
+    dw, dh = iw * scale, ih * scale
+    c.drawImage(ImageReader(image), x + (w - dw) / 2, y + (h - dh) / 2, width=dw, height=dh)
 
 
 def draw_bullets(
@@ -214,17 +255,17 @@ def draw_bullets(
     leading: float = 14,
     max_lines_each: int = 3,
     color=MUTED,
-    bullet=RUST,
 ) -> float:
     for item in items:
-        c.setFillColor(bullet)
-        c.circle(x + 3, y + 4, 2, fill=1, stroke=0)
+        c.setStrokeColor(FAINT)
+        c.setLineWidth(1)
+        c.line(x, y + 4, x + 7, y + 4)
         y = draw_text(
             c,
             item,
-            x + 13,
+            x + 14,
             y,
-            width - 13,
+            width - 14,
             size=size,
             leading=leading,
             color=color,
@@ -238,62 +279,56 @@ def draw_cover(c: canvas.Canvas, data: dict) -> None:
     profile = data["profile"]
     c.setFillColor(PAPER)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_texture(c)
 
-    draw_image(c, "/assets/portfolio/wadang-prop-object.webp", PAGE_W - 385, 86, 320, 360)
-    draw_label(c, "2027 Campus Recruitment Portfolio", MARGIN, PAGE_H - 104)
-    y = draw_title(c, profile["name"], MARGIN, PAGE_H - 144, 390, size=44)
-    y = draw_title(c, profile["title"], MARGIN, y - 2, 450, size=25)
-    c.setFillColor(GREEN)
-    c.setFont(FONT_BOLD, 13)
-    c.drawString(MARGIN, y - 8, profile["subtitle"])
-    y = draw_text(c, profile["summary"], MARGIN, y - 36, 440, size=11.5, leading=19, color=MUTED)
+    draw_cover_photo(c, PAGE_W - 410, 76, 350, 378)
+    draw_label(c, "2027 Campus Recruitment Portfolio", MARGIN, PAGE_H - 106)
+    y = draw_title(c, profile["name"], MARGIN, PAGE_H - 148, 390, size=48)
+    y = draw_title(c, profile["title"], MARGIN, y - 3, 455, size=24)
+    y = draw_text(c, profile["summary"], MARGIN, y - 28, 430, size=11.5, leading=20, color=MUTED, max_lines=3)
 
-    meta_y = y - 24
-    for text, color in [
-        (profile["target"], GREEN_DARK),
-        (profile["location"], BLUE),
-        (profile["graduation"], RUST),
-        (f"邮箱：{profile['email']}", INK),
-        ("公开网页与 PDF 版本仅保留邮箱", MUTED),
-    ]:
-        meta_y = draw_text(c, text, MARGIN, meta_y, 420, font=FONT_BOLD, size=10.2, leading=18, color=color)
+    c.setStrokeColor(LINE)
+    c.setLineWidth(0.8)
+    c.line(MARGIN, y - 14, MARGIN + 420, y - 14)
+
+    meta_y = y - 42
+    for text in [profile["target"], profile["location"], profile["graduation"], f"邮箱：{profile['email']}"]:
+        meta_y = draw_text(c, text, MARGIN, meta_y, 420, font=FONT_BOLD, size=10.2, leading=18, color=TEXT)
 
 
 def draw_fit_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
-    draw_page_base(c, "岗位匹配", page_no)
+    draw_page_base(c, "岗位方向", page_no)
     draw_label(c, "Target Roles", MARGIN, PAGE_H - 76)
-    draw_title(c, "主投方向：文旅文创 / AIGC 视觉 / 数字文旅体验", MARGIN, PAGE_H - 103, 610, size=24)
+    draw_title(c, "主投方向", MARGIN, PAGE_H - 104, 420, size=30)
+    draw_text(c, data["profile"]["target"], MARGIN, PAGE_H - 146, 560, size=11, leading=18, color=MUTED)
 
     card_w = (PAGE_W - MARGIN * 2 - 18) / 2
-    y_top = PAGE_H - 230
-    accents = [GREEN, RUST, BLUE, GOLD]
+    y_top = PAGE_H - 270
     for idx, card in enumerate(data["fitCards"]):
         x = MARGIN + (idx % 2) * (card_w + 18)
-        y = y_top - (idx // 2) * 115
-        draw_card(c, x, y, card_w, 94)
-        c.setFillColor(accents[idx % len(accents)])
-        c.rect(x, y + 91, card_w, 3, fill=1, stroke=0)
-        c.setFillColor(INK)
-        c.setFont(FONT_BOLD, 14)
+        y = y_top - (idx // 2) * 118
+        draw_block(c, x, y, card_w, 96, fill=HexColor("#f8f8f5"))
+        c.setFillColor(GREEN)
+        c.rect(x, y + 92, card_w, 4, fill=1, stroke=0)
+        c.setFillColor(GREEN)
+        c.setFont(FONT_BOLD, 10)
         c.drawString(x + 16, y + 66, card["title"])
-        draw_text(c, card["keywords"], x + 16, y + 45, card_w - 32, font=FONT_BOLD, size=9.4, leading=14, color=accents[idx % len(accents)])
-        draw_text(c, card["proof"], x + 16, y + 25, card_w - 32, size=9.2, leading=13, color=MUTED, max_lines=2)
+        draw_text(c, card["keywords"], x + 16, y + 43, card_w - 32, font=FONT_BOLD, size=15, leading=18, color=INK)
+        draw_text(c, card["proof"], x + 16, y + 21, card_w - 32, size=9.2, leading=13, color=MUTED, max_lines=2)
 
     c.setFillColor(INK)
-    c.setFont(FONT_BOLD, 16)
-    c.drawString(MARGIN, 176, "AIGC 使用口径")
-    c.setFillColor(MUTED)
-    c.setFont(FONT_REGULAR, 9.8)
-    c.drawString(MARGIN, 154, "只写已能由作品材料支撑的流程，不把 AI 初稿包装为最终作品。")
-
-    step_w = (PAGE_W - MARGIN * 2 - 27) / 4
-    for idx, item in enumerate(data["workflow"]):
-        x = MARGIN + idx * (step_w + 9)
-        draw_card(c, x, 70, step_w, 66, fill=HexColor("#fffaf2"))
-        c.setFillColor(GREEN if idx % 2 == 0 else RUST)
-        c.setFont(FONT_BOLD, 11)
-        c.drawString(x + 12, 112, f"{idx + 1}. {item['step']}")
-        draw_text(c, item["text"], x + 12, 94, step_w - 24, size=8.2, leading=11.2, color=MUTED, max_lines=4)
+    c.setFont(FONT_BOLD, 17)
+    c.drawString(MARGIN, 105, "投递口径")
+    draw_text(
+        c,
+        "作品集先呈现可被面试官快速判断的方向、能力和项目结果；具体项目文本后续逐项精修。",
+        MARGIN,
+        80,
+        PAGE_W - MARGIN * 2,
+        size=10.2,
+        leading=15,
+        color=MUTED,
+    )
 
 
 def draw_resume_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
@@ -301,12 +336,15 @@ def draw_resume_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
     resume = data["resume"]
     profile = data["profile"]
     left_x = MARGIN
-    right_x = MARGIN + 360
+    right_x = MARGIN + 356
 
     draw_label(c, "Resume", left_x, PAGE_H - 76)
-    draw_title(c, "杨赫然", left_x, PAGE_H - 104, 300, size=30)
+    draw_title(c, "杨赫然", left_x, PAGE_H - 104, 300, size=32)
     draw_text(c, profile["target"], left_x, PAGE_H - 150, 300, size=10.5, leading=17, color=MUTED)
-    y = PAGE_H - 206
+    draw_text(c, f"{profile['location']}  /  {profile['graduation']}", left_x, PAGE_H - 205, 300, font=FONT_BOLD, size=9.8, leading=15, color=TEXT)
+    draw_text(c, f"邮箱：{profile['email']}", left_x, PAGE_H - 232, 300, font=FONT_BOLD, size=9.8, leading=15, color=TEXT)
+
+    y = PAGE_H - 282
     y = section_block(c, "教育背景", resume["education"], left_x, y, 300)
 
     c.setFillColor(INK)
@@ -319,23 +357,23 @@ def draw_resume_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
         if next_x > left_x + 300:
             tag_x = left_x
             tag_y -= 26
-        tag_x = draw_tag(c, skill, tag_x, tag_y, fill=WHITE, stroke=LINE, color=BLUE)
+        tag_x = draw_tag(c, skill, tag_x, tag_y, fill=WHITE, stroke=LINE, color=MUTED)
 
     c.setFillColor(INK)
-    c.setFont(FONT_BOLD, 15)
-    c.drawString(right_x, PAGE_H - 76, "实践经历")
-    y_right = PAGE_H - 102
+    c.setFont(FONT_BOLD, 16)
+    c.drawString(right_x, PAGE_H - 76, "经历")
+    y_right = PAGE_H - 106
     for item in resume["experience"]:
-        c.setFillColor(RUST)
+        c.setFillColor(GREEN)
         c.setFont(FONT_BOLD, 9)
         c.drawString(right_x, y_right, item["time"])
         y_right = draw_text(c, item["title"], right_x, y_right - 16, 390, font=FONT_BOLD, size=10.4, leading=15, color=INK)
         y_right = draw_text(c, item["text"], right_x, y_right - 2, 390, size=9.4, leading=14, color=MUTED, max_lines=3) - 10
 
     c.setFillColor(INK)
-    c.setFont(FONT_BOLD, 15)
-    c.drawString(right_x, 218, "获奖")
-    draw_bullets(c, resume["awards"], right_x, 194, 390, size=8.5, leading=12, max_lines_each=2, color=MUTED)
+    c.setFont(FONT_BOLD, 16)
+    c.drawString(right_x, 210, "获奖与证书")
+    draw_bullets(c, resume["awards"], right_x, 186, 390, size=8.5, leading=12, max_lines_each=2, color=MUTED)
 
 
 def section_block(c: canvas.Canvas, heading: str, items: list[dict], x: float, y: float, width: float) -> float:
@@ -344,7 +382,7 @@ def section_block(c: canvas.Canvas, heading: str, items: list[dict], x: float, y
     c.drawString(x, y, heading)
     y -= 26
     for item in items:
-        c.setFillColor(RUST)
+        c.setFillColor(GREEN)
         c.setFont(FONT_BOLD, 8.8)
         c.drawString(x, y, item["time"])
         y = draw_text(c, item["title"], x, y - 14, width, font=FONT_BOLD, size=10.2, leading=14, color=INK)
@@ -365,7 +403,7 @@ def draw_project_page(c: canvas.Canvas, project: dict, page_no: int) -> None:
         for idx, item in enumerate(media[:4]):
             draw_image(c, item["src"], left_x + idx * (thumb_w + 9), 66, thumb_w, 56)
 
-    draw_label(c, f"{project['year']} / {project['category']}", right_x, PAGE_H - 78, color=RUST)
+    draw_label(c, f"{project['year']} / {project['category']}", right_x, PAGE_H - 78)
     y = draw_title(c, project["title"], right_x, PAGE_H - 105, PAGE_W - right_x - MARGIN, size=21)
     y = draw_text(c, project["summary"], right_x, y - 4, PAGE_W - right_x - MARGIN, size=10.3, leading=16, color=MUTED, max_lines=4) - 6
 
@@ -376,13 +414,13 @@ def draw_project_page(c: canvas.Canvas, project: dict, page_no: int) -> None:
         if next_x > PAGE_W - MARGIN:
             tag_x = right_x
             tag_y -= 24
-        tag_x = draw_tag(c, tag, tag_x, tag_y, fill=WHITE, stroke=LINE, color=GREEN_DARK)
+        tag_x = draw_tag(c, tag, tag_x, tag_y, fill=WHITE, stroke=LINE, color=MUTED)
     y = tag_y - 30
 
     y = draw_small_section(c, "项目角色", [project["role"]], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=3)
-    y = draw_small_section(c, "证据与亮点", project["evidence"], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=2)
+    y = draw_small_section(c, "证据与亮点", project["evidence"][:2], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=2)
     y = draw_small_section(c, "输出物", [" / ".join(project["outputs"])], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=2)
-    draw_small_section(c, "岗位关联", [project["relevance"]], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=3, heading_color=BLUE)
+    draw_small_section(c, "岗位关联", [project["relevance"]], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=3)
 
 
 def draw_small_section(
@@ -394,9 +432,8 @@ def draw_small_section(
     width: float,
     *,
     max_lines_each: int,
-    heading_color=INK,
 ) -> float:
-    c.setFillColor(heading_color)
+    c.setFillColor(INK)
     c.setFont(FONT_BOLD, 11.5)
     c.drawString(x, y, title)
     y -= 18
