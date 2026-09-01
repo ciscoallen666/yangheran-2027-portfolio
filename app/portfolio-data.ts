@@ -30,11 +30,11 @@ export const profile = {
 
 export const filters = [
   '全部',
-  '文旅文创',
-  'AIGC视觉',
-  '交互展示',
-  '材料手工',
-  '动态视觉',
+  '文旅',
+  'AIGC',
+  '交互',
+  '材料',
+  '动态',
 ];
 
 export const fitCards = [
