@@ -133,13 +133,34 @@ def draw_text(
 
 
 def draw_texture(c: canvas.Canvas) -> None:
-    c.setStrokeColor(HexColor("#d8d9d4"))
-    c.setLineWidth(0.28)
-    for idx in range(0, 14):
-        y = 48 + idx * 38
-        c.line(MARGIN, y, PAGE_W - MARGIN, y + (idx % 3 - 1) * 4)
-    c.setFillColor(HexColor("#f2f2ee"))
-    c.circle(PAGE_W - 120, PAGE_H - 96, 80, fill=1, stroke=0)
+    c.setFillColor(HexColor("#f4f4ef"))
+    c.circle(PAGE_W - 118, PAGE_H - 96, 84, fill=1, stroke=0)
+    c.setFillColor(HexColor("#d8ddd2"))
+    for x, y, rx, ry, angle in [
+        (112, PAGE_H - 96, 74, 18, -18),
+        (210, PAGE_H - 132, 96, 22, -12),
+        (702, PAGE_H - 154, 110, 24, -20),
+        (650, 118, 126, 26, -16),
+        (156, 172, 92, 20, -24),
+    ]:
+        c.saveState()
+        c.translate(x, y)
+        c.rotate(angle)
+        c.scale(rx, ry)
+        c.circle(0, 0, 1, fill=1, stroke=0)
+        c.restoreState()
+    c.setFillColor(HexColor("#eef0ea"))
+    for x, y, rx, ry, angle in [
+        (138, PAGE_H - 75, 88, 16, -24),
+        (735, PAGE_H - 118, 108, 18, -17),
+        (612, 152, 144, 22, -12),
+    ]:
+        c.saveState()
+        c.translate(x, y)
+        c.rotate(angle)
+        c.scale(rx, ry)
+        c.circle(0, 0, 1, fill=1, stroke=0)
+        c.restoreState()
 
 
 def draw_page_base(c: canvas.Canvas, title: str, page_no: int) -> None:
@@ -237,7 +258,7 @@ def draw_image(c: canvas.Canvas, src: str, x: float, y: float, w: float, h: floa
         c.drawCentredString(x + w / 2, y + h / 2, "图片缺失")
         return
 
-    image = prepare_image(path, grayscale=True)
+    image = prepare_image(path, grayscale=False)
     iw, ih = image.size
     scale = min(w / iw, h / ih)
     dw, dh = iw * scale, ih * scale
@@ -292,7 +313,13 @@ def draw_cover(c: canvas.Canvas, data: dict) -> None:
     c.line(MARGIN, y - 14, MARGIN + 420, y - 14)
 
     meta_y = y - 42
-    for text in [profile["target"], profile["location"], profile["graduation"], f"邮箱：{profile['email']}"]:
+    for text in [
+        profile["target"],
+        profile["location"],
+        profile["graduation"],
+        f"邮箱：{profile['email']}",
+        f"电话：{profile['phone']}",
+    ]:
         meta_y = draw_text(c, text, MARGIN, meta_y, 420, font=FONT_BOLD, size=10.2, leading=18, color=TEXT)
 
 
@@ -316,20 +343,6 @@ def draw_fit_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
         draw_text(c, card["keywords"], x + 16, y + 43, card_w - 32, font=FONT_BOLD, size=15, leading=18, color=INK)
         draw_text(c, card["proof"], x + 16, y + 21, card_w - 32, size=9.2, leading=13, color=MUTED, max_lines=2)
 
-    c.setFillColor(INK)
-    c.setFont(FONT_BOLD, 17)
-    c.drawString(MARGIN, 105, "投递口径")
-    draw_text(
-        c,
-        "作品集先呈现可被面试官快速判断的方向、能力和项目结果；具体项目文本后续逐项精修。",
-        MARGIN,
-        80,
-        PAGE_W - MARGIN * 2,
-        size=10.2,
-        leading=15,
-        color=MUTED,
-    )
-
 
 def draw_resume_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
     draw_page_base(c, "简历摘要", page_no)
@@ -343,6 +356,7 @@ def draw_resume_page(c: canvas.Canvas, data: dict, page_no: int) -> None:
     draw_text(c, profile["target"], left_x, PAGE_H - 150, 300, size=10.5, leading=17, color=MUTED)
     draw_text(c, f"{profile['location']}  /  {profile['graduation']}", left_x, PAGE_H - 205, 300, font=FONT_BOLD, size=9.8, leading=15, color=TEXT)
     draw_text(c, f"邮箱：{profile['email']}", left_x, PAGE_H - 232, 300, font=FONT_BOLD, size=9.8, leading=15, color=TEXT)
+    draw_text(c, f"电话：{profile['phone']}", left_x, PAGE_H - 252, 300, font=FONT_BOLD, size=9.8, leading=15, color=TEXT)
 
     y = PAGE_H - 282
     y = section_block(c, "教育背景", resume["education"], left_x, y, 300)
@@ -419,8 +433,7 @@ def draw_project_page(c: canvas.Canvas, project: dict, page_no: int) -> None:
 
     y = draw_small_section(c, "项目角色", [project["role"]], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=3)
     y = draw_small_section(c, "证据与亮点", project["evidence"][:2], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=2)
-    y = draw_small_section(c, "输出物", [" / ".join(project["outputs"])], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=2)
-    draw_small_section(c, "岗位关联", [project["relevance"]], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=3)
+    draw_small_section(c, "输出物", [" / ".join(project["outputs"])], right_x, y, PAGE_W - right_x - MARGIN, max_lines_each=2)
 
 
 def draw_small_section(

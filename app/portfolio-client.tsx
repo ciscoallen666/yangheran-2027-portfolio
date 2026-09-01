@@ -4,7 +4,7 @@
 
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import { ArrowRight, Download, ExternalLink, Mail, MapPin } from 'lucide-react';
+import { ArrowRight, Download, ExternalLink, Mail, MapPin, Phone } from 'lucide-react';
 
 import { filters, fitCards, profile, projects, resume } from './portfolio-data';
 
@@ -139,14 +139,10 @@ export default function PortfolioClient() {
       <section id="works" className="py-16">
         <div className="mx-auto w-[min(1180px,calc(100%-32px))]">
           <div className="flex items-end justify-between gap-6 max-lg:block">
-            <SectionLead
-              eyebrow="Selected Works"
-              title="重点项目"
-              text="以文旅文创、AIGC 视觉和数字展示为主线呈现，项目细节后续可继续逐个调整。"
-            />
-            <div className="mt-6 min-w-[360px] max-lg:min-w-0" aria-label="作品筛选">
+            <SectionLead eyebrow="Selected Works" title="重点项目" />
+            <div className="mt-6 flex min-w-[520px] flex-wrap items-center gap-3 max-lg:min-w-0" aria-label="作品筛选">
               <button
-                className={`mb-3 h-9 border px-4 text-sm font-semibold ${
+                className={`h-9 border px-4 text-sm font-semibold ${
                   activeFilter === '全部'
                     ? 'border-black bg-black text-white'
                     : 'border-black/14 bg-white/54 text-black/58 hover:border-black/42'
@@ -157,23 +153,22 @@ export default function PortfolioClient() {
               >
                 全部
               </button>
-              <div className="flex flex-wrap gap-2">
-                {otherFilters.map((filter) => (
-                  <button
-                    key={filter}
-                    className={`h-9 border px-3 text-sm ${
-                      activeFilter === filter
-                        ? 'border-[#5f6f5a] bg-[#5f6f5a] text-white'
-                        : 'border-black/12 bg-white/44 text-black/52 hover:border-black/38 hover:text-black'
-                    }`}
-                    type="button"
-                    aria-pressed={activeFilter === filter}
-                    onClick={() => changeFilter(filter)}
-                  >
-                    {filter}
-                  </button>
-                ))}
-              </div>
+              <span className="h-8 w-px bg-black/20" aria-hidden="true" />
+              {otherFilters.map((filter) => (
+                <button
+                  key={filter}
+                  className={`h-9 border px-3 text-sm ${
+                    activeFilter === filter
+                      ? 'border-[#4f654a] bg-[#4f654a] text-white'
+                      : 'border-black/12 bg-white/44 text-black/52 hover:border-black/38 hover:text-black'
+                  }`}
+                  type="button"
+                  aria-pressed={activeFilter === filter}
+                  onClick={() => changeFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -192,7 +187,7 @@ export default function PortfolioClient() {
                   onClick={() => selectProject(project.id)}
                 >
                   <img
-                    className="h-[92px] w-full object-cover grayscale max-sm:h-44"
+                    className="h-[92px] w-full object-cover max-sm:h-44"
                     style={{ objectPosition: project.coverPosition || '50% 50%' }}
                     src={project.cover}
                     alt=""
@@ -213,7 +208,7 @@ export default function PortfolioClient() {
             <article className="sticky top-24 self-start border border-black/10 bg-white/66 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-xl max-lg:static">
               <div className="bg-[#111]">
                 <img
-                  className="h-[384px] w-full object-contain grayscale max-md:h-[280px]"
+                  className="h-[384px] w-full object-contain max-md:h-[280px]"
                   src={currentMedia.src}
                   alt={currentMedia.label}
                 />
@@ -252,10 +247,6 @@ export default function PortfolioClient() {
                   <DetailBlock title="项目角色" lines={[selectedProject.role]} />
                   <DetailBlock title="证据与亮点" lines={selectedProject.evidence.slice(0, 2)} />
                 </div>
-                <div className="mt-5 border-t border-black/10 pt-4">
-                  <p className="text-xs font-semibold text-black/42">岗位关联</p>
-                  <p className="mt-2 text-sm leading-7 text-black/54">{selectedProject.relevance}</p>
-                </div>
               </div>
             </article>
           </div>
@@ -269,6 +260,7 @@ export default function PortfolioClient() {
             <div className="mt-6 grid gap-3 text-sm">
               <MetaItem icon={<MapPin className="size-4" />} title="地点" text={profile.location} />
               <MetaItem icon={<Mail className="size-4" />} title="邮箱" text={profile.email} href={`mailto:${profile.email}`} />
+              <MetaItem icon={<Phone className="size-4" />} title="电话" text={profile.phone} href={`tel:${profile.phone}`} />
             </div>
           </aside>
 
@@ -307,26 +299,34 @@ export default function PortfolioClient() {
             </p>
             <h2 className="text-3xl font-black tracking-normal">联系</h2>
           </div>
-          <a
-            className="mt-6 inline-flex min-h-11 items-center gap-2 bg-white px-4 text-sm font-semibold text-[#141414] hover:bg-[#e7e9e2] max-md:mt-5"
-            href={`mailto:${profile.email}`}
-          >
-            {profile.email} <ExternalLink className="size-4" aria-hidden="true" />
-          </a>
+          <div className="mt-6 flex flex-wrap gap-3 max-md:mt-5">
+            <a
+              className="inline-flex min-h-11 items-center gap-2 bg-white px-4 text-sm font-semibold text-[#141414] hover:bg-[#e7e9e2]"
+              href={`mailto:${profile.email}`}
+            >
+              {profile.email} <ExternalLink className="size-4" aria-hidden="true" />
+            </a>
+            <a
+              className="inline-flex min-h-11 items-center gap-2 border border-white/22 px-4 text-sm font-semibold text-white hover:border-white/54"
+              href={`tel:${profile.phone}`}
+            >
+              {profile.phone} <Phone className="size-4" aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </section>
     </main>
   );
 }
 
-function SectionLead({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
+function SectionLead({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
   return (
     <div className="max-w-2xl">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#5f6f5a]">
         {eyebrow}
       </p>
       <h2 className="text-4xl font-black tracking-normal text-black/88 max-md:text-3xl">{title}</h2>
-      <p className="mt-3 text-base leading-7 text-black/52">{text}</p>
+      {text && <p className="mt-3 text-base leading-7 text-black/52">{text}</p>}
     </div>
   );
 }

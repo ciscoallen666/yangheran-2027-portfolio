@@ -21,6 +21,7 @@ export const profile = {
   summary:
     '设计硕士在读，本科数字媒体艺术。作品围绕传统文化转译、文创产品、数字交互展示、视觉物料与手工模型展开。',
   email: 'yangheran20000@163.com',
+  phone: '18092115338',
   location: '意向城市：北上广深优先，西安可沟通',
   graduation: '2027.07 硕士预计毕业',
   target:
@@ -40,12 +41,12 @@ export const fitCards = [
   {
     title: '文旅文创',
     keywords: '文化转译 / 产品表达',
-    proof: '瓦当迷宫、马勺脸谱、四羊方尊贴花、农产品包装。',
+    proof: '瓦当迷宫、四羊方尊贴花、马勺脸谱、农产品包装。',
   },
   {
     title: 'AIGC 视觉',
     keywords: '概念发散 / 视觉重构',
-    proof: '铜镜交互、四羊方尊版花及视觉方案整理。',
+    proof: '铜镜交互、视觉方案整理与文化元素重构。',
   },
   {
     title: '数字文旅',
@@ -55,7 +56,7 @@ export const fitCards = [
   {
     title: '视觉内容',
     keywords: '平面物料 / 动态输出',
-    proof: '海报、展陈视觉、定格动画与后期素材。',
+    proof: '定格动画、展陈视觉与后期素材。',
   },
 ];
 
@@ -104,7 +105,7 @@ export const projects: Project[] = [
     id: 'tang-mirror',
     title: '唐瑞兽葡萄纹铜镜数字交互展示系统',
     year: '2026',
-    category: 'AIGC视觉',
+    category: '文旅文创',
     cover: '/assets/portfolio/copper-mirror-pattern-system.webp',
     summary:
       '围绕唐代铜镜的纹样、形制和材质层级构建数字展示系统，通过旋转、缩放、解构、复原与手势交互理解文物结构。',
@@ -129,7 +130,7 @@ export const projects: Project[] = [
     coverPosition: '50% 18%',
     summary:
       '从四羊方尊中提取羊纹、卷云纹和夔龙纹等元素，转化为适配摩托车油箱与车身表面的版花方案。',
-    tags: ['AIGC参考', '版花系统', '曲面适配', '国潮视觉'],
+    tags: ['AIGC视觉', '版花系统', '曲面适配', '国潮视觉'],
     role:
       '参与纹样拆解、AI 参考图筛选、贴花落位校正、版花系统表达与应用效果整理。',
     evidence: [
@@ -202,25 +203,23 @@ export const projects: Project[] = [
   },
   {
     id: 'visual-motion',
-    title: '视觉与动态内容补充',
+    title: '定格动画与动态内容补充',
     year: '2025-2026',
     category: '动态视觉',
-    cover: '/assets/portfolio/bluebridge-eye-poster.webp',
+    cover: '/assets/portfolio/day-stop-motion.webp',
     summary:
-      '以竞赛海报、定格动画和短片素材补充平面构成、镜头节奏、PR/AE 后期和多媒体输出能力。',
-    tags: ['海报', '定格动画', 'PR/AE', '多媒体视觉'],
+      '以定格动画和短片素材补充镜头节奏、逐帧执行、PR/AE 后期和多媒体输出能力。',
+    tags: ['定格动画', 'PR/AE', '多媒体视觉'],
     role:
-      '完成或参与画面构成、视频剪辑、分镜/帧画面整理与视觉输出，适合作为 AIGC 视觉岗位的基础能力补充。',
+      '完成或参与视频剪辑、分镜/帧画面整理与视觉输出，适合作为 AIGC 视觉岗位的基础能力补充。',
     evidence: [
-      '《万物的眼》获第十六届蓝桥杯视觉艺术设计赛海报设计命题省赛三等奖。',
       '定格动画素材能够证明逐帧执行、镜头节奏、场景组织和后期剪辑能力。',
       '影视后期助理经历补充了现场拍摄、素材整理和项目流程理解。',
     ],
-    outputs: ['海报作品', '定格动画封面', '分镜/内容帧', '视频剪辑素材'],
+    outputs: ['定格动画封面', '分镜/内容帧', '视频剪辑素材'],
     relevance:
       '适合 AIGC 视觉、运营视觉、广告素材和多媒体创意方向作为辅助项目。',
     media: [
-      { src: '/assets/portfolio/bluebridge-eye-poster.webp', label: '万物的眼' },
       { src: '/assets/portfolio/day-stop-motion.webp', label: '定格动画《一天》' },
       { src: '/assets/portfolio/oil-noodles-stop-motion.webp', label: '定格动画《油泼面》' },
     ],
@@ -275,7 +274,6 @@ export const resume = {
     '2026｜《吉言汉瓦“永受嘉福”文创设计》｜第十七届蓝桥杯视觉艺术设计赛文创设计非命题陕西赛区一等奖',
     '2026｜《唐瑞兽葡萄纹铜镜数字交互展示系统》｜第十七届蓝桥杯视觉艺术设计赛交互设计 UI 非命题陕西赛区三等奖',
     '2026｜《朔·离散》｜米兰设计周中国高校设计学科师生优秀作品展二等奖',
-    '2025｜《万物的眼》｜第十六届蓝桥杯视觉艺术设计赛海报设计命题省赛三等奖',
     '2025｜《青铜御风：方尊巡狩录》｜两岸数字艺术设计三等奖',
     '2024｜佳县红润枣业产品包装设计｜陕西高校“双百工程”乡村特色产品创意设计大赛三等奖',
     '普通话二乙｜全媒体运营｜心理咨询师',
