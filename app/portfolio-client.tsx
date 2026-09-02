@@ -4,9 +4,9 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { BriefcaseBusiness, Mail, MapPin, Phone } from 'lucide-react';
 
-import { filters, fitCards, profile, projects, resume } from './portfolio-data';
+import { filters, profile, projects, resume } from './portfolio-data';
 
 const otherFilters = filters.filter((filter) => filter !== '全部');
 const filterAliases: Record<string, string[]> = {
@@ -20,18 +20,15 @@ const filterAliases: Record<string, string[]> = {
 const socialLinks = [
   {
     name: '小红书',
-    note: '图文作品',
-    image: '/assets/social/xiaohongshu.jpg',
+    image: '/assets/social/xiaohongshu.png',
   },
   {
     name: '抖音',
-    note: '动态内容',
-    image: '/assets/social/douyin.jpg',
+    image: '/assets/social/douyin.png',
   },
   {
     name: '微信',
-    note: '好友二维码',
-    image: '/assets/social/wechat.jpg',
+    image: '/assets/social/wechat.png',
   },
 ];
 
@@ -101,15 +98,11 @@ export default function PortfolioClient() {
       <header className={`site-header fixed top-0 z-30 w-full ${showHeader ? 'site-header--visible' : ''}`}>
         <div className="mx-auto flex min-h-16 w-[min(1180px,calc(100%-32px))] items-center justify-between gap-4">
           <a className="flex items-center gap-3" href="#top" aria-label="返回顶部">
-            <span className="grid size-8 place-items-center rounded-[10px] bg-[#141414] text-xs font-semibold text-white">
-              YH
+            <span className="brand-mark grid size-8 place-items-center rounded-[10px] text-xs font-semibold">
+              HR
             </span>
-            <span className="text-sm font-semibold tracking-normal">杨赫然</span>
           </a>
           <nav className="flex items-center gap-1 overflow-x-auto text-sm text-black/56">
-            <a className="px-3 py-2 hover:text-black" href="#direction">
-              方向
-            </a>
             <a className="px-3 py-2 hover:text-black" href="#works">
               作品
             </a>
@@ -125,25 +118,31 @@ export default function PortfolioClient() {
 
       <section id="top" className="hero-cover relative min-h-svh overflow-hidden">
         <img
-          className="absolute inset-0 h-full w-full object-cover"
+          className="hero-bg absolute inset-0 h-full w-full object-cover"
           src="/assets/portfolio/frosted-glass-hero.png"
           alt="霜面玻璃后的抽象人影，一手按住面板，一手持笔书写"
         />
+        <img
+          className="hero-hand-ghost absolute inset-0 h-full w-full object-cover"
+          src="/assets/portfolio/frosted-glass-hero.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="dust-field" aria-hidden="true" />
         <div className="absolute inset-0 bg-[#ebece7]/8" aria-hidden="true" />
         <div className="relative z-10 mx-auto flex min-h-svh w-[min(1180px,calc(100%-32px))] items-center justify-center py-16">
           <div className="hero-identity text-center">
             <div className="hero-name-lockup">
-              <span className="hero-avatar avatar-mark" aria-hidden="true">
+              <span className="hero-avatar avatar-mark">
                 <img
                   className="h-full w-full object-cover"
                   src="/assets/portfolio/profile-cisco-color.png"
-                  alt=""
-                  aria-hidden="true"
+                  alt="杨赫然头像"
                 />
               </span>
               <div className="hero-name-copy">
                 <h1 className="hero-name">{profile.name}</h1>
-                <p className="mt-4 text-sm font-semibold tracking-[0.18em] text-black/52">
+                <p className="hero-english mt-4">
                   Yang Heran · Cisco Allen
                 </p>
               </div>
@@ -155,32 +154,7 @@ export default function PortfolioClient() {
         </div>
       </section>
 
-      <section id="direction" className="content-section border-b border-black/10 py-14">
-        <div className="section-inner mx-auto w-[min(1180px,calc(100%-32px))]">
-          <div className="flex items-baseline justify-between gap-6 max-md:block">
-            <h2 className="text-4xl font-black tracking-normal text-black/88 max-md:text-3xl">
-              主投方向
-            </h2>
-            <p className="mt-3 text-base font-semibold leading-7 text-black/58">
-              文旅 / 文创 / AIGC视觉 / 交互体验
-            </p>
-          </div>
-          <div className="mt-8 grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1">
-            {fitCards.map((card) => (
-              <article key={card.title} className="surface-block min-h-[134px] rounded-[24px] border border-white/46 bg-white/54 p-5 backdrop-blur-2xl">
-                <h3 className="text-2xl font-black leading-tight text-black/88">
-                  {card.title}
-                </h3>
-                <p className="mt-5 text-sm font-semibold leading-6 text-[#4f654a]">
-                  {card.keywords}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="works" className="content-section py-16">
+      <section id="works" className="content-section first-content py-16">
         <div className="section-inner mx-auto w-[min(1180px,calc(100%-32px))]">
           <div className="flex items-end justify-between gap-6 max-lg:block">
             <SectionLead title="重点项目" />
@@ -301,9 +275,7 @@ export default function PortfolioClient() {
           <aside className="self-start pt-4">
             <SectionLead title="简历" />
             <div className="mt-8 grid gap-2 text-sm">
-              <MetaItem icon={<MapPin className="size-4" />} title="地点" text={profile.location} />
-              <MetaItem icon={<Mail className="size-4" />} title="邮箱" text={profile.email} href={`mailto:${profile.email}`} />
-              <MetaItem icon={<Phone className="size-4" />} title="电话" text={profile.phone} href={`tel:${profile.phone}`} />
+              <MetaItem icon={<BriefcaseBusiness className="size-4" />} title="意向" text={profile.target} />
             </div>
           </aside>
 
@@ -338,20 +310,19 @@ export default function PortfolioClient() {
         <div className="mx-auto w-[min(1180px,calc(100%-32px))]">
           <div className="flex items-end justify-between gap-6 max-md:block">
             <h2 className="text-3xl font-black tracking-normal">联系</h2>
-            <p className="mt-3 text-sm font-semibold tracking-[0.18em] text-white/44">
-              SOCIAL / QR
-            </p>
+            <div className="mt-5 flex flex-wrap gap-2 text-sm">
+              <ContactLink icon={<MapPin className="size-4" />} text={profile.location} />
+              <ContactLink icon={<Mail className="size-4" />} text={profile.email} href={`mailto:${profile.email}`} />
+              <ContactLink icon={<Phone className="size-4" />} text={profile.phone} href={`tel:${profile.phone}`} />
+            </div>
           </div>
-          <div className="mt-8 grid grid-cols-3 gap-5 max-lg:grid-cols-2 max-sm:grid-cols-1">
+          <div className="mt-8 grid grid-cols-3 gap-4 max-sm:gap-2">
             {socialLinks.map((item) => (
-              <article key={item.name} className="surface-block rounded-[28px] border border-white/16 bg-white/10 p-4 backdrop-blur-2xl">
+              <article key={item.name} className="surface-block social-card rounded-[24px] border border-white/16 bg-white/10 p-3 backdrop-blur-2xl">
                 <div className="social-qr-plate">
                   <img src={item.image} alt={`${item.name}二维码`} />
                 </div>
-                <div className="mt-4 flex items-baseline justify-between gap-4">
-                  <h3 className="text-xl font-black text-white/88">{item.name}</h3>
-                  <p className="text-sm font-semibold text-[#9fb293]">{item.note}</p>
-                </div>
+                <h3 className="mt-3 text-center text-base font-semibold text-white/88">{item.name}</h3>
               </article>
             ))}
           </div>
@@ -359,6 +330,25 @@ export default function PortfolioClient() {
       </section>
     </main>
   );
+}
+
+function ContactLink({ icon, text, href }: { icon: ReactNode; text: string; href?: string }) {
+  const content = (
+    <>
+      {icon}
+      <span>{text}</span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a className="contact-chip pressable" href={href}>
+        {content}
+      </a>
+    );
+  }
+
+  return <span className="contact-chip">{content}</span>;
 }
 
 function SectionLead({ eyebrow, title, text }: { eyebrow?: string; title: string; text?: string }) {
