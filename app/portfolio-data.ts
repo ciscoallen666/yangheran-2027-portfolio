@@ -151,7 +151,7 @@ export const projects: Project[] = [
   {
     id: 'mashao',
     title: '秦韵马勺脸谱：APP 交互与文创样机',
-    year: '毕业设计',
+    year: '2024',
     category: '交互展示',
     cover: '/assets/portfolio/mashao-interaction.webp',
     summary:
@@ -178,7 +178,7 @@ export const projects: Project[] = [
   {
     id: 'paper-light',
     title: '三教学楼纸雕灯',
-    year: '纸艺手作',
+    year: '2024',
     category: '材料手工',
     cover: '/assets/portfolio/san-jiao-paper-light-01.webp',
     coverPosition: '50% 78%',

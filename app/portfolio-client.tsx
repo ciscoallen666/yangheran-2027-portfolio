@@ -4,9 +4,9 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
-import { filters, profile, projects, resume } from './portfolio-data';
+import { filters, profile, projects } from './portfolio-data';
 
 const otherFilters = filters.filter((filter) => filter !== '全部');
 const filterAliases: Record<string, string[]> = {
@@ -32,7 +32,7 @@ const socialLinks = [
   },
 ];
 
-type TimelineKind = 'education' | 'experience' | 'award';
+type TimelineKind = 'education' | 'experience' | 'award' | 'project';
 
 const timelineItems: {
   kind: TimelineKind;
@@ -41,38 +41,75 @@ const timelineItems: {
   time: string;
   title: string;
   text: string;
+  side: 'left' | 'right';
+  x: number;
+  y: number;
 }[] = [
-  {
-    kind: 'experience',
-    label: '经历',
-    year: '2019',
-    time: '2019.07 - 2020.03',
-    title: '西安太乙画室｜素描 / 速写老师',
-    text: '完成基础造型课程教学，积累视觉表达与线下教学沟通经验。',
-  },
   {
     kind: 'education',
     label: '教育',
-    year: '2019',
-    time: '2019.09 - 2023.07',
-    title: '西安邮电大学｜数字媒体艺术｜本科',
-    text: '完成数字媒体艺术学习，建立影像、交互与平面视觉基础。',
+    year: '2027',
+    time: '2027.07',
+    title: '硕士预计毕业',
+    text: '进入 2027 届全职秋招，方向聚焦文旅、文创、AIGC 视觉与交互体验。',
+    side: 'right',
+    x: 67,
+    y: 6,
   },
   {
-    kind: 'experience',
-    label: '经历',
-    year: '2021',
-    time: '2021.07 - 2021.08',
-    title: '德润文化广告有限公司｜影视后期助理',
-    text: '参与策划、分镜、拍摄计划与后期素材整理。',
+    kind: 'award',
+    label: '获奖',
+    year: '2026',
+    time: '2026',
+    title: '蓝桥杯 / 米兰设计周获奖',
+    text: '文创设计一等奖、交互设计三等奖，《朔·离散》二等奖。',
+    side: 'left',
+    x: 37,
+    y: 15,
   },
   {
-    kind: 'experience',
-    label: '经历',
-    year: '2022',
-    time: '2022.03 - 2022.08',
-    title: '新东方教育有限公司｜网宣中级 / 运营助教 / 带班助教',
-    text: '负责课程助教、海报制作、活动执行、摄影与后期修图。',
+    kind: 'project',
+    label: '作品',
+    year: '2026',
+    time: '2026',
+    title: '吉言汉瓦“永受嘉福”文创设计',
+    text: '以瓦当形制转译为滚珠迷宫文创产品。',
+    side: 'right',
+    x: 61,
+    y: 23,
+  },
+  {
+    kind: 'project',
+    label: '作品',
+    year: '2026',
+    time: '2026',
+    title: '唐瑞兽葡萄纹铜镜数字交互展示系统',
+    text: '完成文化内容、视觉层级与交互展示表达。',
+    side: 'right',
+    x: 70,
+    y: 33,
+  },
+  {
+    kind: 'project',
+    label: '作品',
+    year: '2025',
+    time: '2025',
+    title: '青铜御风：四羊方尊摩托车贴花设计',
+    text: '传统器物纹样转译为现代载体版花系统。',
+    side: 'left',
+    x: 49,
+    y: 43,
+  },
+  {
+    kind: 'award',
+    label: '获奖',
+    year: '2025',
+    time: '2025',
+    title: '两岸数字艺术设计三等奖',
+    text: '《青铜御风：方尊巡狩录》获得赛事奖项。',
+    side: 'left',
+    x: 26,
+    y: 52,
   },
   {
     kind: 'education',
@@ -81,6 +118,31 @@ const timelineItems: {
     time: '2024.09 - 2027.07',
     title: '西安外国语大学｜设计｜硕士在读',
     text: '持续进行设计研究、文化转译、视觉叙事与作品系统化表达。',
+    side: 'right',
+    x: 41,
+    y: 61,
+  },
+  {
+    kind: 'project',
+    label: '作品',
+    year: '2024',
+    time: '2024',
+    title: '秦韵马勺脸谱：APP 交互与文创样机',
+    text: '非遗内容的 APP 交互、角色视觉与文创样机延展。',
+    side: 'right',
+    x: 64,
+    y: 70,
+  },
+  {
+    kind: 'project',
+    label: '作品',
+    year: '2024',
+    time: '2024',
+    title: '三教学楼纸雕灯',
+    text: '以校园建筑轮廓完成纸雕分层、镂空和光影表达。',
+    side: 'left',
+    x: 78,
+    y: 79,
   },
   {
     kind: 'award',
@@ -89,70 +151,94 @@ const timelineItems: {
     time: '2024',
     title: '佳县红润枣业产品包装设计',
     text: '陕西高校“双百工程”乡村特色产品创意设计大赛三等奖。',
+    side: 'left',
+    x: 55,
+    y: 88,
   },
   {
-    kind: 'award',
-    label: '获奖',
-    year: '2025',
-    time: '2025',
-    title: '青铜御风：方尊巡狩录',
-    text: '两岸数字艺术设计三等奖。',
+    kind: 'experience',
+    label: '经历',
+    year: '2022',
+    time: '2022.03 - 2022.08',
+    title: '新东方教育有限公司｜网宣中级 / 运营助教',
+    text: '参与课程助教、海报制作、活动执行、摄影与后期修图。',
+    side: 'right',
+    x: 31,
+    y: 97,
   },
   {
-    kind: 'award',
-    label: '获奖',
-    year: '2026',
-    time: '2026',
-    title: '吉言汉瓦“永受嘉福”文创设计',
-    text: '蓝桥杯视觉艺术设计赛文创设计非命题陕西赛区一等奖。',
-  },
-  {
-    kind: 'award',
-    label: '获奖',
-    year: '2026',
-    time: '2026',
-    title: '唐瑞兽葡萄纹铜镜数字交互展示系统',
-    text: '蓝桥杯视觉艺术设计赛交互设计 UI 非命题陕西赛区三等奖。',
-  },
-  {
-    kind: 'award',
-    label: '获奖',
-    year: '2026',
-    time: '2026',
-    title: '朔·离散',
-    text: '米兰设计周中国高校设计学科师生优秀作品展二等奖。',
-  },
-  {
-    kind: 'award',
-    label: '证书',
-    year: '证书',
-    time: '证书',
-    title: '高中美术教师资格证｜普通话二乙｜全媒体运营｜心理咨询师',
-    text: '补充教学、运营与心理咨询相关资格，支撑文旅内容表达与教育传播场景。',
+    kind: 'experience',
+    label: '经历',
+    year: '2021',
+    time: '2021.07 - 2021.08',
+    title: '德润文化广告有限公司｜影视后期助理',
+    text: '参与策划、分镜、拍摄计划与后期素材整理。',
+    side: 'right',
+    x: 18,
+    y: 106,
   },
   {
     kind: 'education',
     label: '教育',
-    year: '2027',
-    time: '2027.07',
-    title: '硕士预计毕业',
-    text: '面向文旅文创、AIGC视觉与交互体验方向进入全职秋招。',
+    year: '2019',
+    time: '2019.09 - 2023.07',
+    title: '西安邮电大学｜数字媒体艺术｜本科',
+    text: '建立影像、交互、三维与平面视觉基础。',
+    side: 'left',
+    x: 38,
+    y: 115,
+  },
+  {
+    kind: 'experience',
+    label: '经历',
+    year: '2019',
+    time: '2019.07 - 2020.03',
+    title: '西安太乙画室｜素描 / 速写老师',
+    text: '完成基础造型课程教学与课堂管理。',
+    side: 'left',
+    x: 61,
+    y: 124,
   },
 ];
 
-const timelinePointPositions = [
-  { x: 8, y: 78 },
-  { x: 18, y: 57 },
-  { x: 31, y: 73 },
-  { x: 43, y: 52 },
-  { x: 36, y: 32 },
-  { x: 18, y: 18 },
-  { x: 48, y: 16 },
-  { x: 64, y: 31 },
-  { x: 79, y: 17 },
-  { x: 91, y: 36 },
-  { x: 77, y: 57 },
-  { x: 92, y: 18 },
+const timelineYears = [
+  { year: '至今', x: 67, y: 3 },
+  { year: '2026', x: 61, y: 21 },
+  { year: '2025', x: 29, y: 50 },
+  { year: '2024', x: 43, y: 63 },
+  { year: '2022', x: 31, y: 95 },
+  { year: '2021', x: 18, y: 104 },
+  { year: '2019', x: 47, y: 116 },
+];
+
+const otherGroups = [
+  {
+    title: 'AI 软件使用',
+    align: 'left',
+    items: [
+      'ChatGPT',
+      'Gemini',
+      'Codex Skills',
+      'AI 资料整理',
+      'AI 方案发散',
+      'AI 视频生成',
+    ],
+  },
+  {
+    title: '传统软件',
+    align: 'right',
+    items: ['PS', 'AI', 'PR', 'AE', '3DMAX', 'Office', '交互原型'],
+  },
+  {
+    title: '证书',
+    align: 'left',
+    items: ['高中美术教师资格证', '普通话二乙', '全媒体运营', '心理咨询师'],
+  },
+  {
+    title: '兴趣爱好',
+    align: 'right',
+    items: ['摄影', '展览观察', '手工模型', '影像剪辑'],
+  },
 ];
 
 function matchesFilter(project: (typeof projects)[number], filter: string) {
@@ -273,7 +359,7 @@ export default function PortfolioClient() {
                 <p className="hero-english mt-4">Yang Heran · Cisco Allen</p>
               </div>
             </div>
-            <p className="hero-tags mt-8">文旅 · AIGC视觉 · 交互</p>
+            <p className="hero-tags mt-4">文旅 · AIGC视觉 · 交互</p>
           </div>
         </div>
       </section>
@@ -382,23 +468,16 @@ export default function PortfolioClient() {
                 <p className="text-xs font-semibold text-[#5f6f5a]">
                   {selectedProject.year} / {selectedProject.category}
                 </p>
-                <h3 className="mt-3 text-3xl font-black leading-tight tracking-normal text-black/88 max-md:text-2xl">
-                  {selectedProject.title}
-                </h3>
+                <div className="project-title-row">
+                  <h3 className="text-3xl font-black leading-tight tracking-normal text-black/88 max-md:text-2xl">
+                    {selectedProject.title}
+                  </h3>
+                  <TagRow tags={selectedProject.tags} />
+                </div>
                 <p className="mt-3 max-w-2xl text-base leading-7 text-black/56">
                   {selectedProject.summary}
                 </p>
-                <TagRow tags={selectedProject.tags} />
-                <div className="mt-6 grid grid-cols-2 gap-5 max-md:grid-cols-1">
-                  <DetailBlock
-                    title="项目角色"
-                    lines={[selectedProject.role]}
-                  />
-                  <DetailBlock
-                    title="证据与亮点"
-                    lines={selectedProject.evidence.slice(0, 2)}
-                  />
-                </div>
+                <DetailBlock title="项目角色" lines={[selectedProject.role]} />
               </div>
             </article>
           </div>
@@ -409,8 +488,7 @@ export default function PortfolioClient() {
         <div className="section-inner mx-auto w-[min(1320px,calc(100%-32px))]">
           <div className="resume-header">
             <SectionLead title="简历" />
-            <div className="resume-intent mt-8">
-              <p>意向</p>
+            <div className="resume-intent">
               <strong>{profile.target}</strong>
               <span>{profile.location}</span>
             </div>
@@ -418,16 +496,21 @@ export default function PortfolioClient() {
 
           <div className="mt-8 grid gap-5">
             <TimelinePanel />
-            <section className="surface-block rounded-[24px] border border-white/32 bg-[#eee7d7]/52 p-5 backdrop-blur-3xl">
-              <h3 className="text-xl font-black text-black/88">技能</h3>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {resume.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="rounded-full border border-black/10 bg-[#f6f0e4]/58 px-3 py-1.5 text-sm font-semibold text-black/58 backdrop-blur-xl"
+            <section className="other-section surface-block rounded-[24px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
+              <SectionLead title="其他" />
+              <div className="other-grid mt-5">
+                {otherGroups.map((group) => (
+                  <section
+                    key={group.title}
+                    className={`other-group other-group--${group.align}`}
                   >
-                    {skill}
-                  </span>
+                    <h3>{group.title}</h3>
+                    <div>
+                      {group.items.map((item) => (
+                        <span key={item}>{item}</span>
+                      ))}
+                    </div>
+                  </section>
                 ))}
               </div>
             </section>
@@ -440,11 +523,6 @@ export default function PortfolioClient() {
           <div className="contact-header">
             <h2 className="text-3xl font-black tracking-normal">联系</h2>
             <div className="contact-info-list">
-              <ContactLink
-                label="意向城市"
-                icon={<MapPin className="size-4" />}
-                text={profile.location}
-              />
               <ContactLink
                 label="邮箱"
                 icon={<Mail className="size-4" />}
@@ -459,7 +537,7 @@ export default function PortfolioClient() {
               />
             </div>
           </div>
-          <div className="social-grid mt-10 grid grid-cols-3 gap-8 max-sm:gap-3">
+          <div className="social-grid mt-8">
             {socialLinks.map((item) => (
               <article key={item.name} className="social-card">
                 <div className="social-qr-plate">
@@ -519,7 +597,7 @@ function SectionLead({
   text?: string;
 }) {
   return (
-    <div className="max-w-2xl">
+    <div className="section-lead max-w-2xl">
       {eyebrow && (
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#5f6f5a]">
           {eyebrow}
@@ -535,12 +613,8 @@ function SectionLead({
 
 function TimelinePanel() {
   return (
-    <section className="surface-block timeline-panel rounded-[28px] border border-white/32 bg-[#eee7d7]/50 p-5 backdrop-blur-3xl">
+    <section className="surface-block timeline-panel rounded-[28px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
       <div className="timeline-panel-head">
-        <div>
-          <p className="timeline-kicker">2019 - 2027</p>
-          <h3>时间轴</h3>
-        </div>
         <div className="timeline-legend" aria-label="时间轴图例">
           <span className="timeline-legend-item timeline-legend-item--education">
             教育
@@ -551,38 +625,53 @@ function TimelinePanel() {
           <span className="timeline-legend-item timeline-legend-item--award">
             获奖
           </span>
+          <span className="timeline-legend-item timeline-legend-item--project">
+            作品
+          </span>
         </div>
       </div>
-      <div className="timeline-stage-scroll" aria-label="简历时间轴">
+      <div
+        className="timeline-stage-scroll timeline-stage-scroll--vertical"
+        aria-label="简历时间轴"
+      >
         <div className="timeline-stage">
           <div className="timeline-track">
             <svg
               className="timeline-path"
-              viewBox="0 0 100 100"
+              viewBox="0 0 100 128"
               preserveAspectRatio="none"
               aria-hidden="true"
             >
-              <path d="M8 78 C14 52 23 53 31 73 C39 92 51 54 43 52 C32 34 20 28 18 18 C40 4 58 10 64 31 C69 52 83 0 91 36 C98 70 68 64 77 57 C86 47 88 31 92 18" />
+              <path d="M74 3 C86 13 48 18 61 27 C78 40 24 43 30 54 C38 66 77 57 65 72 C52 88 18 76 31 96 C42 112 78 106 63 124" />
             </svg>
-            {timelineItems.map((item, index) => {
-              const position = timelinePointPositions[index];
-              return (
-                <article
-                  key={`${item.time}-${item.title}`}
-                  className={`timeline-node timeline-node--${item.kind}`}
-                  style={{ left: `${position.x}%`, top: `${position.y}%` }}
-                >
-                  <span className="timeline-dot" />
-                  <span className="timeline-node-copy">
-                    <span className="timeline-node-meta">
-                      {item.year} · {item.label}
-                    </span>
-                    <span className="timeline-node-title">{item.title}</span>
-                    <span className="timeline-node-text">{item.text}</span>
+            {timelineYears.map((item) => (
+              <span
+                key={item.year}
+                className="timeline-year-ring"
+                style={{ left: `${item.x}%`, top: `${item.y}%` }}
+              >
+                {item.year}
+              </span>
+            ))}
+            {timelineItems.map((item) => (
+              <article
+                key={`${item.time}-${item.title}`}
+                className={`timeline-node timeline-node--${item.kind} timeline-node--${item.side}`}
+                style={{ left: `${item.x}%`, top: `${item.y}%` }}
+              >
+                <span className="timeline-dot" aria-hidden="true" />
+                {(item.kind === 'education' || item.kind === 'experience') && (
+                  <span className="timeline-span" aria-hidden="true" />
+                )}
+                <span className="timeline-node-copy">
+                  <span className="timeline-node-meta">
+                    {item.time} · {item.label}
                   </span>
-                </article>
-              );
-            })}
+                  <span className="timeline-node-title">{item.title}</span>
+                  <span className="timeline-node-text">{item.text}</span>
+                </span>
+              </article>
+            ))}
           </div>
         </div>
       </div>
@@ -592,12 +681,9 @@ function TimelinePanel() {
 
 function TagRow({ tags }: { tags: string[] }) {
   return (
-    <div className="mt-4 flex flex-wrap gap-2">
+    <div className="tag-row">
       {tags.map((tag) => (
-        <span
-          key={tag}
-          className="rounded-full border border-black/10 bg-white/48 px-2.5 py-1 text-xs font-semibold text-black/48"
-        >
+        <span key={tag} className="project-tag">
           {tag}
         </span>
       ))}
