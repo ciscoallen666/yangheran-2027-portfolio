@@ -32,185 +32,6 @@ const socialLinks = [
   },
 ];
 
-type TimelineKind = 'education' | 'experience' | 'award' | 'project';
-
-const timelineItems: {
-  kind: TimelineKind;
-  label: string;
-  year: string;
-  time: string;
-  title: string;
-  text: string;
-  side: 'left' | 'right';
-  x: number;
-  y: number;
-}[] = [
-  {
-    kind: 'education',
-    label: '教育',
-    year: '2027',
-    time: '2027.07',
-    title: '硕士预计毕业',
-    text: '进入 2027 届全职秋招，方向聚焦文旅、文创、AIGC 视觉与交互体验。',
-    side: 'right',
-    x: 67,
-    y: 6,
-  },
-  {
-    kind: 'award',
-    label: '获奖',
-    year: '2026',
-    time: '2026',
-    title: '蓝桥杯 / 米兰设计周获奖',
-    text: '文创设计一等奖、交互设计三等奖，《朔·离散》二等奖。',
-    side: 'left',
-    x: 37,
-    y: 15,
-  },
-  {
-    kind: 'project',
-    label: '作品',
-    year: '2026',
-    time: '2026',
-    title: '吉言汉瓦“永受嘉福”文创设计',
-    text: '以瓦当形制转译为滚珠迷宫文创产品。',
-    side: 'right',
-    x: 61,
-    y: 23,
-  },
-  {
-    kind: 'project',
-    label: '作品',
-    year: '2026',
-    time: '2026',
-    title: '唐瑞兽葡萄纹铜镜数字交互展示系统',
-    text: '完成文化内容、视觉层级与交互展示表达。',
-    side: 'right',
-    x: 70,
-    y: 33,
-  },
-  {
-    kind: 'project',
-    label: '作品',
-    year: '2025',
-    time: '2025',
-    title: '青铜御风：四羊方尊摩托车贴花设计',
-    text: '传统器物纹样转译为现代载体版花系统。',
-    side: 'left',
-    x: 49,
-    y: 43,
-  },
-  {
-    kind: 'award',
-    label: '获奖',
-    year: '2025',
-    time: '2025',
-    title: '两岸数字艺术设计三等奖',
-    text: '《青铜御风：方尊巡狩录》获得赛事奖项。',
-    side: 'left',
-    x: 26,
-    y: 52,
-  },
-  {
-    kind: 'education',
-    label: '教育',
-    year: '2024',
-    time: '2024.09 - 2027.07',
-    title: '西安外国语大学｜设计｜硕士在读',
-    text: '持续进行设计研究、文化转译、视觉叙事与作品系统化表达。',
-    side: 'right',
-    x: 41,
-    y: 61,
-  },
-  {
-    kind: 'project',
-    label: '作品',
-    year: '2024',
-    time: '2024',
-    title: '秦韵马勺脸谱：APP 交互与文创样机',
-    text: '非遗内容的 APP 交互、角色视觉与文创样机延展。',
-    side: 'right',
-    x: 64,
-    y: 70,
-  },
-  {
-    kind: 'project',
-    label: '作品',
-    year: '2024',
-    time: '2024',
-    title: '三教学楼纸雕灯',
-    text: '以校园建筑轮廓完成纸雕分层、镂空和光影表达。',
-    side: 'left',
-    x: 78,
-    y: 79,
-  },
-  {
-    kind: 'award',
-    label: '获奖',
-    year: '2024',
-    time: '2024',
-    title: '佳县红润枣业产品包装设计',
-    text: '陕西高校“双百工程”乡村特色产品创意设计大赛三等奖。',
-    side: 'left',
-    x: 55,
-    y: 88,
-  },
-  {
-    kind: 'experience',
-    label: '经历',
-    year: '2022',
-    time: '2022.03 - 2022.08',
-    title: '新东方教育有限公司｜网宣中级 / 运营助教',
-    text: '参与课程助教、海报制作、活动执行、摄影与后期修图。',
-    side: 'right',
-    x: 31,
-    y: 97,
-  },
-  {
-    kind: 'experience',
-    label: '经历',
-    year: '2021',
-    time: '2021.07 - 2021.08',
-    title: '德润文化广告有限公司｜影视后期助理',
-    text: '参与策划、分镜、拍摄计划与后期素材整理。',
-    side: 'right',
-    x: 18,
-    y: 106,
-  },
-  {
-    kind: 'education',
-    label: '教育',
-    year: '2019',
-    time: '2019.09 - 2023.07',
-    title: '西安邮电大学｜数字媒体艺术｜本科',
-    text: '建立影像、交互、三维与平面视觉基础。',
-    side: 'left',
-    x: 38,
-    y: 115,
-  },
-  {
-    kind: 'experience',
-    label: '经历',
-    year: '2019',
-    time: '2019.07 - 2020.03',
-    title: '西安太乙画室｜素描 / 速写老师',
-    text: '完成基础造型课程教学与课堂管理。',
-    side: 'left',
-    x: 61,
-    y: 124,
-  },
-];
-
-const timelineYears = [
-  { year: '至今', x: 67, y: 3 },
-  { year: '2026', x: 61, y: 21 },
-  { year: '2025', x: 29, y: 50 },
-  { year: '2024', x: 43, y: 63 },
-  { year: '2022', x: 31, y: 95 },
-  { year: '2021', x: 18, y: 104 },
-  { year: '2019', x: 47, y: 116 },
-];
-
 const otherGroups = [
   {
     title: 'AI 软件使用',
@@ -490,14 +311,13 @@ export default function PortfolioClient() {
             <SectionLead title="简历" />
             <div className="resume-intent">
               <strong>{profile.target}</strong>
-              <span>{profile.location}</span>
             </div>
           </div>
 
           <div className="mt-8 grid gap-5">
             <TimelinePanel />
             <section className="other-section surface-block rounded-[24px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
-              <SectionLead title="其他" />
+              <SectionLead title="个人介绍" />
               <div className="other-grid mt-5">
                 {otherGroups.map((group) => (
                   <section
@@ -613,65 +433,262 @@ function SectionLead({
 
 function TimelinePanel() {
   return (
-    <section className="surface-block timeline-panel rounded-[28px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
-      <div className="timeline-panel-head">
-        <div className="timeline-legend" aria-label="时间轴图例">
-          <span className="timeline-legend-item timeline-legend-item--education">
-            教育
+    <section className="surface-block timeline-panel timeline-panel--final rounded-[28px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
+      <div className="timeline-layout">
+        <div className="timeline-key" aria-label="时间轴图例">
+          <span>
+            <i className="timeline-key-sample timeline-key-sample--year" />
+            年份
           </span>
-          <span className="timeline-legend-item timeline-legend-item--experience">
-            经历
-          </span>
-          <span className="timeline-legend-item timeline-legend-item--award">
+          <span>
+            <i className="timeline-key-sample timeline-key-sample--award" />
             获奖
           </span>
-          <span className="timeline-legend-item timeline-legend-item--project">
-            作品
+          <span>
+            <i className="timeline-key-sample timeline-key-sample--edu" />
+            教育
+          </span>
+          <span>
+            <i className="timeline-key-sample timeline-key-sample--exp" />
+            实习
           </span>
         </div>
-      </div>
-      <div
-        className="timeline-stage-scroll timeline-stage-scroll--vertical"
-        aria-label="简历时间轴"
-      >
-        <div className="timeline-stage">
-          <div className="timeline-track">
+
+        <div className="timeline-canvas" aria-label="简历时间轴">
+          <div className="timeline-final-stage">
             <svg
-              className="timeline-path"
-              viewBox="0 0 100 128"
+              className="timeline-final-svg"
+              viewBox="0 0 1000 1240"
               preserveAspectRatio="none"
-              aria-hidden="true"
+              role="img"
+              aria-label="从下往上的弓字形时间轴"
             >
-              <path d="M74 3 C86 13 48 18 61 27 C78 40 24 43 30 54 C38 66 77 57 65 72 C52 88 18 76 31 96 C42 112 78 106 63 124" />
+              <defs>
+                <marker
+                  id="timeline-arrow"
+                  markerWidth="7"
+                  markerHeight="7"
+                  refX="6"
+                  refY="3.5"
+                  orient="auto"
+                  markerUnits="strokeWidth"
+                >
+                  <path
+                    className="timeline-arrow-head"
+                    d="M0,0 L7,3.5 L0,7 Z"
+                  />
+                </marker>
+              </defs>
+              <path
+                className="timeline-axis"
+                d="M120 1120 H880
+                   Q940 1120 940 1050
+                   Q940 980 880 980
+                   H120
+                   Q60 980 60 910
+                   Q60 840 120 840
+                   H880
+                   Q940 840 940 770
+                   Q940 700 880 700
+                   H120
+                   Q60 700 60 630
+                   Q60 560 120 560
+                   H880
+                   Q940 560 940 490
+                   Q940 420 880 420
+                   H120
+                   Q60 420 60 350
+                   Q60 280 120 280
+                   H880
+                   Q940 280 940 210
+                   Q940 140 880 140
+                   H135
+                   Q60 140 60 84
+                   Q60 40 160 40
+                   H340"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M150 1120 H274"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M850 980 H726"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M150 840 H274"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M850 700 H726"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M150 560 H274"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M850 420 H726"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M150 280 H274"
+              />
+              <path
+                className="timeline-direction"
+                markerEnd="url(#timeline-arrow)"
+                d="M850 140 H726"
+              />
+              <path
+                className="timeline-edu-line"
+                d="M690 1130 H880
+                   Q930 1130 930 1060
+                   Q930 990 880 990
+                   H120
+                   Q70 990 70 920
+                   Q70 850 120 850
+                   H880
+                   Q930 850 930 780
+                   Q930 710 880 710
+                   H120
+                   Q70 710 70 640
+                   Q70 570 120 570
+                   H565"
+              />
+              <path
+                className="timeline-edu-line"
+                d="M310 430
+                   H120
+                   Q70 430 70 360
+                   Q70 290 120 290
+                   H880
+                   Q930 290 930 220
+                   Q930 150 880 150
+                   H135
+                   Q70 150 70 94
+                   Q70 50 160 50
+                   H300"
+              />
+              <path
+                className="timeline-exp-line"
+                d="M565 1110 H880 Q950 1110 950 1040 Q950 970 690 970"
+              />
+              <path className="timeline-exp-line" d="M565 830 H625" />
+              <path className="timeline-exp-line" d="M690 690 H374" />
             </svg>
-            {timelineYears.map((item) => (
-              <span
-                key={item.year}
-                className="timeline-year-ring"
-                style={{ left: `${item.x}%`, top: `${item.y}%` }}
-              >
-                {item.year}
-              </span>
-            ))}
-            {timelineItems.map((item) => (
-              <article
-                key={`${item.time}-${item.title}`}
-                className={`timeline-node timeline-node--${item.kind} timeline-node--${item.side}`}
-                style={{ left: `${item.x}%`, top: `${item.y}%` }}
-              >
-                <span className="timeline-dot" aria-hidden="true" />
-                {(item.kind === 'education' || item.kind === 'experience') && (
-                  <span className="timeline-span" aria-hidden="true" />
-                )}
-                <span className="timeline-node-copy">
-                  <span className="timeline-node-meta">
-                    {item.time} · {item.label}
-                  </span>
-                  <span className="timeline-node-title">{item.title}</span>
-                  <span className="timeline-node-text">{item.text}</span>
-                </span>
-              </article>
-            ))}
+
+            <span className="timeline-node timeline-node--year timeline-node--2019">
+              2019
+            </span>
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-2019" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-2019">
+              <b>7月</b>西安太乙画室
+            </span>
+            <span className="timeline-range-end timeline-range-end--edu timeline-edu-start-2019" />
+            <span className="timeline-range-label timeline-range-label--edu timeline-edu-label-2019">
+              <b>9月</b>西安邮电大学｜本科
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2020">
+              2020
+            </span>
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-2020" />
+            <span className="timeline-month timeline-month--exp timeline-exp-month-2020">
+              3月
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2021">
+              2021
+            </span>
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-2021" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-2021" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-2021">
+              <b>7月</b>德润文化广告
+            </span>
+            <span className="timeline-month timeline-month--exp timeline-exp-month-2021">
+              8月
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2022">
+              2022
+            </span>
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-2022" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-2022" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-2022">
+              <b>3月</b>新东方｜运营助教
+            </span>
+            <span className="timeline-month timeline-month--exp timeline-exp-month-2022">
+              8月
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2023">
+              2023
+            </span>
+            <span className="timeline-range-end timeline-range-end--edu timeline-edu-end-2023" />
+            <span className="timeline-month timeline-month--edu timeline-edu-month-2023">
+              7月
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--bachelor">
+              本科毕业
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2024">
+              2024
+            </span>
+            <span className="timeline-range-end timeline-range-end--edu timeline-edu-start-2024" />
+            <span className="timeline-range-label timeline-range-label--edu timeline-edu-label-2024">
+              <b>9月</b>西安外国语大学｜硕士在读
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--maqiao">
+              秦韵马勺脸谱
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--paper-lamp">
+              三教学楼纸雕灯
+            </span>
+            <span className="timeline-node timeline-node--award timeline-award-2024" />
+            <span className="timeline-card timeline-card--award timeline-card--jujube">
+              佳县红润枣业包装
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2025">
+              2025
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--siyang">
+              四羊方尊摩托车贴花
+            </span>
+            <span className="timeline-node timeline-node--award timeline-award-2025" />
+            <span className="timeline-card timeline-card--award timeline-card--strait">
+              两岸数字艺术设计
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--stop-motion">
+              定格动画系列
+            </span>
+
+            <span className="timeline-node timeline-node--year timeline-node--2026">
+              2026
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--hanwa">
+              吉言汉瓦“永受嘉福”
+            </span>
+            <span className="timeline-node timeline-node--award timeline-award-2026" />
+            <span className="timeline-card timeline-card--award timeline-card--bridge">
+              蓝桥杯 / 米兰设计周
+            </span>
+            <span className="timeline-card timeline-card--project timeline-card--tangmirror">
+              唐镜数字交互展示
+            </span>
+            <span className="timeline-range-end timeline-range-end--edu timeline-edu-end-2027" />
+            <span className="timeline-month timeline-month--edu timeline-edu-month-2027">
+              7月
+            </span>
           </div>
         </div>
       </div>
