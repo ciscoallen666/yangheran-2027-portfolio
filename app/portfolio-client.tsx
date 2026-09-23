@@ -2,9 +2,7 @@
 
 /* oxlint-disable next/no-html-link-for-pages next/no-img-element */
 
-import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { Mail, Phone } from 'lucide-react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import { filters, profile, projects } from './portfolio-data';
 
@@ -16,21 +14,6 @@ const filterAliases: Record<string, string[]> = {
   材料: ['材料', '纸雕', '手工'],
   动态: ['动态', '定格动画', 'PR/AE'],
 };
-
-const socialLinks = [
-  {
-    name: '微信',
-    image: '/assets/social/wechat.png',
-  },
-  {
-    name: '小红书',
-    image: '/assets/social/xiaohongshu.png',
-  },
-  {
-    name: '抖音',
-    image: '/assets/social/douyin.png',
-  },
-];
 
 const otherGroups = [
   {
@@ -58,9 +41,28 @@ const otherGroups = [
   {
     title: '兴趣爱好',
     align: 'right',
-    items: ['摄影', '展览观察', '手工模型', '影像剪辑'],
+    items: ['摄影', '骑行', '手工', '诗歌'],
   },
 ];
+
+const capabilityData = [
+  { label: '文化内容转译', value: 4.4 },
+  { label: '视觉叙事', value: 4.1 },
+  { label: 'AI 协同创作', value: 3.4 },
+  { label: '交互原型', value: 3.2 },
+  { label: '材料与结构', value: 3.8 },
+  { label: '项目推进', value: 2.8 },
+];
+
+const workStyleData = [
+  { left: '理性判断', right: '感性直觉', position: 54 },
+  { left: '独立沉浸', right: '协作表达', position: 42 },
+  { left: '探索发散', right: '收敛执行', position: 32 },
+  { left: '稳定推进', right: '灵感冲刺', position: 68 },
+  { left: '灵活调整', right: '坚持核心', position: 72 },
+];
+
+const personalityKeywords = ['敏感', '好奇', '独立', '共情', '执着'];
 
 function matchesFilter(project: (typeof projects)[number], filter: string) {
   if (filter === '全部') return true;
@@ -78,6 +80,30 @@ export default function PortfolioClient() {
   const [selectedId, setSelectedId] = useState(projects[0].id);
   const [activeMedia, setActiveMedia] = useState(0);
   const [showHeader, setShowHeader] = useState(false);
+
+  useLayoutEffect(() => {
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+
+    if (window.location.hash) {
+      window.history.replaceState(
+        window.history.state,
+        '',
+        `${window.location.pathname}${window.location.search}`,
+      );
+    }
+
+    const resetToFirstScreen = () => window.scrollTo(0, 0);
+    resetToFirstScreen();
+    const frame = window.requestAnimationFrame(resetToFirstScreen);
+    window.addEventListener('load', resetToFirstScreen, { once: true });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('load', resetToFirstScreen);
+      window.history.scrollRestoration = previousRestoration;
+    };
+  }, []);
 
   useEffect(() => {
     function updateHeader() {
@@ -130,7 +156,7 @@ export default function PortfolioClient() {
       <header
         className={`site-header fixed top-0 z-30 w-full ${showHeader ? 'site-header--visible' : ''}`}
       >
-        <div className="mx-auto flex min-h-16 w-[min(1180px,calc(100%-32px))] items-center justify-between gap-4">
+        <div className="mx-auto flex min-h-11 w-[min(1180px,calc(100%-32px))] items-center justify-between gap-4">
           <a
             className="flex items-center gap-3"
             href="#top"
@@ -177,10 +203,15 @@ export default function PortfolioClient() {
               </span>
               <div className="hero-name-copy">
                 <h1 className="hero-name">{profile.name}</h1>
-                <p className="hero-english mt-4">Yang Heran · Cisco Allen</p>
+                <p className="hero-english mt-3">
+                  Creative Technologist / AI Experience Designer
+                </p>
               </div>
             </div>
-            <p className="hero-tags mt-4">文旅 · AIGC视觉 · 交互</p>
+            <p className="hero-summary mt-2">
+              擅长将复杂文化、历史、知识内容转化为数字体验
+            </p>
+            <p className="hero-tags mt-3">文旅 · AIGC视觉 · 交互</p>
           </div>
         </div>
       </section>
@@ -260,11 +291,32 @@ export default function PortfolioClient() {
 
             <article className="surface-block sticky top-24 self-start rounded-[28px] border border-white/32 bg-[#eee7d7]/56 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-3xl max-lg:static">
               <div className="overflow-hidden rounded-[20px] bg-[#111]">
-                <img
-                  className="h-[384px] w-full object-contain max-md:h-[280px]"
-                  src={currentMedia.src}
-                  alt={currentMedia.label}
-                />
+                {currentMedia.kind === 'video' ? (
+                  <video
+                    key={currentMedia.src}
+                    className="h-[384px] w-full object-contain max-md:h-[280px]"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    poster={currentMedia.poster}
+                    aria-label={currentMedia.label}
+                  >
+                    <source src={currentMedia.src} type="video/mp4" />
+                    <track
+                      kind="captions"
+                      src={currentMedia.captions}
+                      srcLang="zh-CN"
+                      label="中文"
+                    />
+                    当前浏览器不支持视频播放。
+                  </video>
+                ) : (
+                  <img
+                    className="h-[384px] w-full object-contain max-md:h-[280px]"
+                    src={currentMedia.src}
+                    alt={currentMedia.label}
+                  />
+                )}
               </div>
               {mediaItems.length > 1 && (
                 <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
@@ -305,69 +357,65 @@ export default function PortfolioClient() {
         </div>
       </section>
 
-      <section id="resume" className="content-section py-20">
-        <div className="section-inner mx-auto w-[min(1320px,calc(100%-32px))]">
-          <div className="resume-header">
-            <SectionLead title="简历" />
-            <div className="resume-intent">
-              <strong>{profile.target}</strong>
+      <section id="resume" className="content-section">
+        <div className="section-inner mx-auto w-[min(1180px,calc(100%-32px))]">
+          <div className="resume-screen">
+            <div className="resume-header">
+              <SectionLead title="简历" />
+            </div>
+            <div className="resume-timeline-slot">
+              <TimelinePanel />
             </div>
           </div>
-
-          <div className="mt-8 grid gap-5">
-            <TimelinePanel />
-            <section className="other-section surface-block rounded-[24px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
-              <SectionLead title="个人介绍" />
-              <div className="other-grid mt-5">
-                {otherGroups.map((group) => (
-                  <section
-                    key={group.title}
-                    className={`other-group other-group--${group.align}`}
-                  >
-                    <h3>{group.title}</h3>
-                    <div>
-                      {group.items.map((item) => (
-                        <span key={item}>{item}</span>
-                      ))}
-                    </div>
-                  </section>
-                ))}
+          <section className="other-section">
+            <SectionLead title="个人介绍" />
+            <div className="other-grid">
+              <div className="profile-visuals">
+                <CapabilityRadar />
+                <WorkStyleProfile />
               </div>
-            </section>
-          </div>
+              {otherGroups.map((group) => (
+                <section
+                  key={group.title}
+                  className={`other-group other-group--${group.align}`}
+                >
+                  <h3>{group.title}</h3>
+                  <div>
+                    {group.items.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </section>
         </div>
       </section>
 
-      <section id="contact" className="contact-section py-16 text-white">
-        <div className="mx-auto w-[min(1180px,calc(100%-32px))]">
-          <div className="contact-header">
-            <h2 className="text-3xl font-black tracking-normal">联系</h2>
+      <section id="contact" className="contact-section">
+        <div className="contact-layout mx-auto w-[min(1180px,calc(100%-32px))]">
+          <SectionLead title="联系" />
+          <div className="contact-content">
             <div className="contact-info-list">
               <ContactLink
                 label="邮箱"
-                icon={<Mail className="size-4" />}
                 text={profile.email}
                 href={`mailto:${profile.email}`}
               />
-              <ContactLink
-                label="电话"
-                icon={<Phone className="size-4" />}
-                text={profile.phone}
-                href={`tel:${profile.phone}`}
-              />
-            </div>
-          </div>
-          <div className="social-grid mt-8">
-            {socialLinks.map((item) => (
-              <article key={item.name} className="social-card">
-                <div className="social-qr-plate">
-                  <img src={item.image} alt={`${item.name}二维码`} />
+              <div className="contact-right-column">
+                <ContactLink
+                  label="电话"
+                  text={profile.phone}
+                  href={`tel:${profile.phone}`}
+                />
+                <div className="wechat-contact">
+                  <span className="contact-link-label">微信</span>
+                  <div className="social-qr-plate">
+                    <img src="/assets/social/wechat.png" alt="微信二维码" />
+                  </div>
                 </div>
-                <h3 className="mt-3 text-center text-base font-semibold text-white/88">
-                  {item.name}
-                </h3>
-              </article>
-            ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -377,34 +425,19 @@ export default function PortfolioClient() {
 
 function ContactLink({
   label,
-  icon,
   text,
   href,
 }: {
   label: string;
-  icon: ReactNode;
   text: string;
-  href?: string;
+  href: string;
 }) {
-  const content = (
-    <>
-      <span className="contact-chip-icon">{icon}</span>
-      <span className="min-w-0">
-        <span className="contact-chip-label">{label}</span>
-        <span className="contact-chip-text">{text}</span>
-      </span>
-    </>
+  return (
+    <a className="contact-link pressable" href={href}>
+      <span className="contact-link-label">{label}</span>
+      <span className="contact-link-text">{text}</span>
+    </a>
   );
-
-  if (href) {
-    return (
-      <a className="contact-chip pressable" href={href}>
-        {content}
-      </a>
-    );
-  }
-
-  return <span className="contact-chip">{content}</span>;
 }
 
 function SectionLead({
@@ -431,9 +464,121 @@ function SectionLead({
   );
 }
 
+function CapabilityRadar() {
+  const center = 160;
+  const chartCenterY = 156;
+  const maxRadius = 88;
+  const pointAt = (index: number, radius: number) => {
+    const angle = (-90 + index * 60) * (Math.PI / 180);
+    return `${center + Math.cos(angle) * radius},${chartCenterY + Math.sin(angle) * radius}`;
+  };
+  const rings = [1, 2, 3, 4, 5].map((level) =>
+    capabilityData
+      .map((_, index) => pointAt(index, (maxRadius * level) / 5))
+      .join(' '),
+  );
+  const valuePoints = capabilityData
+    .map((item, index) => pointAt(index, (maxRadius * item.value) / 5))
+    .join(' ');
+  const labels: Array<{
+    x: number;
+    y: number;
+    anchor: 'start' | 'middle' | 'end';
+  }> = [
+    { x: 160, y: 26, anchor: 'middle' },
+    { x: 316, y: 82, anchor: 'end' },
+    { x: 316, y: 238, anchor: 'end' },
+    { x: 160, y: 298, anchor: 'middle' },
+    { x: 4, y: 238, anchor: 'start' },
+    { x: 4, y: 82, anchor: 'start' },
+  ];
+
+  return (
+    <section className="profile-visual profile-visual--radar">
+      <div className="profile-visual-heading">
+        <h3>能力倾向</h3>
+      </div>
+      <svg
+        className="capability-radar"
+        viewBox="0 0 320 320"
+        aria-label="能力倾向"
+      >
+        {rings.map((points, index) => (
+          <polygon
+            key={points}
+            className={`capability-radar-ring ${index === rings.length - 1 ? 'capability-radar-ring--outer' : ''}`}
+            points={points}
+          />
+        ))}
+        {capabilityData.map((item, index) => (
+          <line
+            key={item.label}
+            className="capability-radar-axis"
+            x1={center}
+            y1={chartCenterY}
+            x2={pointAt(index, maxRadius).split(',')[0]}
+            y2={pointAt(index, maxRadius).split(',')[1]}
+          />
+        ))}
+        <polygon className="capability-radar-area" points={valuePoints} />
+        {capabilityData.map((item, index) => {
+          const [x, y] = pointAt(index, (maxRadius * item.value) / 5).split(
+            ',',
+          );
+          const label = labels[index];
+          return (
+            <g key={item.label}>
+              <circle className="capability-radar-dot" cx={x} cy={y} r="3.6" />
+              <text
+                className="capability-radar-label"
+                x={label.x}
+                y={label.y}
+                textAnchor={label.anchor}
+              >
+                {item.label}
+                <tspan className="capability-radar-value" dx="5">
+                  {item.value.toFixed(1)}
+                </tspan>
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </section>
+  );
+}
+
+function WorkStyleProfile() {
+  return (
+    <section className="profile-visual profile-visual--style">
+      <div className="profile-visual-heading">
+        <h3>工作方式倾向</h3>
+      </div>
+      <div className="work-style-list">
+        {workStyleData.map((item) => (
+          <div className="work-style-row" key={`${item.left}-${item.right}`}>
+            <div className="work-style-labels">
+              <span>{item.left}</span>
+              <span>{item.right}</span>
+            </div>
+            <div className="work-style-track" aria-hidden="true">
+              <span style={{ left: `${item.position}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="personality-keywords" aria-label="性格关键词">
+        {personalityKeywords.map((keyword) => (
+          <span key={keyword}>{keyword}</span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function TimelinePanel() {
   return (
-    <section className="surface-block timeline-panel timeline-panel--final rounded-[28px] border border-white/24 bg-[#eee7d7]/46 p-5 backdrop-blur-3xl">
+    <section className="timeline-panel timeline-panel--final">
       <div className="timeline-layout">
         <div className="timeline-key" aria-label="时间轴图例">
           <span>
@@ -460,8 +605,6 @@ function TimelinePanel() {
               className="timeline-final-svg"
               viewBox="0 0 1000 1240"
               preserveAspectRatio="none"
-              role="img"
-              aria-label="从下往上的弓字形时间轴"
             >
               <defs>
                 <marker
@@ -575,14 +718,39 @@ function TimelinePanel() {
                    H135
                    Q70 150 70 94
                    Q70 50 160 50
-                   H300"
+                   H400"
               />
               <path
                 className="timeline-exp-line"
-                d="M565 1110 H880 Q950 1110 950 1040 Q950 970 690 970"
+                d="M565 1110 H880
+                   Q950 1110 950 1040
+                   Q950 970 880 970
+                   H120
+                   Q50 970 50 900
+                   Q50 830 120 830
+                   H550"
               />
-              <path className="timeline-exp-line" d="M565 830 H625" />
-              <path className="timeline-exp-line" d="M690 690 H374" />
+              <path className="timeline-exp-line" d="M620 830 H800" />
+              <path
+                className="timeline-exp-line"
+                d="M690 690 H120
+                   Q50 690 50 620
+                   Q50 550 120 550
+                   H690"
+              />
+              <path
+                className="timeline-exp-line"
+                d="M650 410 H120
+                   Q50 410 50 340
+                   Q50 270 120 270
+                   H880
+                   Q950 270 950 200
+                   Q950 130 880 130
+                   H600"
+              />
+              <path className="timeline-exp-line" d="M296 260 H471" />
+              <path className="timeline-exp-line" d="M412 235 H646" />
+              <path className="timeline-exp-line" d="M760 120 H620" />
             </svg>
 
             <span className="timeline-node timeline-node--year timeline-node--2019">
@@ -600,44 +768,41 @@ function TimelinePanel() {
             <span className="timeline-node timeline-node--year timeline-node--2020">
               2020
             </span>
-            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-2020" />
-            <span className="timeline-month timeline-month--exp timeline-exp-month-2020">
-              3月
-            </span>
 
             <span className="timeline-node timeline-node--year timeline-node--2021">
               2021
             </span>
-            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-2021" />
-            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-2021" />
-            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-2021">
-              <b>7月</b>德润文化广告
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-taiyi" />
+            <span className="timeline-month timeline-month--exp timeline-exp-month-taiyi">
+              6月
             </span>
-            <span className="timeline-month timeline-month--exp timeline-exp-month-2021">
-              8月
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-derun" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-derun" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-derun">
+              <b>8月</b>德润广告
+            </span>
+            <span className="timeline-month timeline-month--exp timeline-exp-month-derun">
+              11月
             </span>
 
             <span className="timeline-node timeline-node--year timeline-node--2022">
               2022
             </span>
-            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-2022" />
-            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-2022" />
-            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-2022">
-              <b>3月</b>新东方｜运营助教
-            </span>
-            <span className="timeline-month timeline-month--exp timeline-exp-month-2022">
-              8月
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-neworiental" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-neworiental">
+              <b>3月</b>新东方
             </span>
 
             <span className="timeline-node timeline-node--year timeline-node--2023">
               2023
             </span>
             <span className="timeline-range-end timeline-range-end--edu timeline-edu-end-2023" />
-            <span className="timeline-month timeline-month--edu timeline-edu-month-2023">
-              7月
+            <span className="timeline-range-label timeline-range-label--edu timeline-edu-label-end-2023">
+              <b>7月</b>本科毕业
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--bachelor">
-              本科毕业
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-neworiental" />
+            <span className="timeline-month timeline-month--exp timeline-exp-month-neworiental">
+              8月
             </span>
 
             <span className="timeline-node timeline-node--year timeline-node--2024">
@@ -647,47 +812,77 @@ function TimelinePanel() {
             <span className="timeline-range-label timeline-range-label--edu timeline-edu-label-2024">
               <b>9月</b>西安外国语大学｜硕士在读
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--maqiao">
-              秦韵马勺脸谱
+            <span className="timeline-node timeline-node--award timeline-award-2024-strait" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2024-strait">
+              两岸铜奖《青铜驭风》
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--paper-lamp">
-              三教学楼纸雕灯
+            <span className="timeline-node timeline-node--award timeline-award-2024-double" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2024-double">
+              双百工程三等奖
             </span>
-            <span className="timeline-node timeline-node--award timeline-award-2024" />
-            <span className="timeline-card timeline-card--award timeline-card--jujube">
-              佳县红润枣业包装
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-guangxi" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-guangxi" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-guangxi">
+              <b>4月</b>光隙物语
+            </span>
+            <span className="timeline-month timeline-month--exp timeline-exp-month-guangxi">
+              6月
             </span>
 
             <span className="timeline-node timeline-node--year timeline-node--2025">
               2025
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--siyang">
-              四羊方尊摩托车贴花
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-lailiangyan" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-lailiangyan" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-lailiangyan">
+              <b>3月</b>良言喜物
             </span>
-            <span className="timeline-node timeline-node--award timeline-award-2025" />
-            <span className="timeline-card timeline-card--award timeline-card--strait">
-              两岸数字艺术设计
+            <span className="timeline-month timeline-month--exp timeline-exp-month-lailiangyan">
+              6月
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--stop-motion">
-              定格动画系列
+            <span className="timeline-node timeline-node--award timeline-award-2025-lacquer" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2025-lacquer">
+              陕西漆艺三等奖
+            </span>
+            <span className="timeline-node timeline-node--award timeline-award-2025-poster" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2025-poster">
+              蓝桥杯海报省三
+            </span>
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-haina" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-haina" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-haina">
+              <b>5月</b>海纳艺创
+            </span>
+            <span className="timeline-month timeline-month--exp timeline-exp-month-haina">
+              9月
             </span>
 
             <span className="timeline-node timeline-node--year timeline-node--2026">
               2026
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--hanwa">
-              吉言汉瓦“永受嘉福”
+            <span className="timeline-node timeline-node--award timeline-award-2026-ui" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2026-ui">
+              蓝桥杯 UI 省三
             </span>
-            <span className="timeline-node timeline-node--award timeline-award-2026" />
-            <span className="timeline-card timeline-card--award timeline-card--bridge">
-              蓝桥杯 / 米兰设计周
+            <span className="timeline-node timeline-node--award timeline-award-2026-cultural" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2026-cultural">
+              蓝桥杯文创省一
             </span>
-            <span className="timeline-card timeline-card--project timeline-card--tangmirror">
-              唐镜数字交互展示
+            <span className="timeline-node timeline-node--award timeline-award-2026-milan" />
+            <span className="timeline-card timeline-card--award timeline-card--award-2026-milan">
+              米兰设计周二等奖
+            </span>
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-start-qingmang" />
+            <span className="timeline-range-end timeline-range-end--exp timeline-exp-end-qingmang" />
+            <span className="timeline-range-label timeline-range-label--exp timeline-exp-label-qingmang">
+              <b>3月</b>青芒时代
+            </span>
+            <span className="timeline-month timeline-month--exp timeline-exp-month-qingmang">
+              7月
             </span>
             <span className="timeline-range-end timeline-range-end--edu timeline-edu-end-2027" />
             <span className="timeline-month timeline-month--edu timeline-edu-month-2027">
-              7月
+              9月
             </span>
           </div>
         </div>

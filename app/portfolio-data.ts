@@ -11,7 +11,13 @@ export type Project = {
   evidence: string[];
   outputs: string[];
   relevance: string;
-  media?: { src: string; label: string }[];
+  media?: {
+    src: string;
+    label: string;
+    kind?: 'image' | 'video';
+    poster?: string;
+    captions?: string;
+  }[];
 };
 
 export const profile = {
@@ -23,7 +29,7 @@ export const profile = {
   email: 'yangheran20000@163.com',
   phone: '18092115338',
   location: '北上广深，西安均可',
-  graduation: '2027.07 硕士预计毕业',
+  graduation: '2027.09 硕士预计毕业',
   target: '文旅 / 文创 / AIGC视觉 / 交互体验',
 };
 
@@ -130,7 +136,7 @@ export const projects: Project[] = [
     evidence: [
       '项目资料中保留了 AI 版花系统效果、油箱细节效果和严格落位参考等过程文件。',
       '从器物纹样到现代载体，重点处理曲面位置、纹样尺度、古铜质感和整体视觉统一。',
-      '作品《青铜御风：方尊巡狩录》获 2024 年两岸数字艺术设计三等奖。',
+      '作品《青铜驭风》获 2024 年两岸艺术设计铜奖。',
     ],
     outputs: ['主海报', '纹样拆解', '部件落位图', '应用效果图'],
     relevance:
@@ -222,29 +228,54 @@ export const projects: Project[] = [
   },
   {
     id: 'visual-motion',
-    title: '定格动画与动态内容补充',
+    title: '定格动画与动态影像',
     year: '2025-2026',
     category: '动态视觉',
     cover: '/assets/portfolio/day-stop-motion.webp',
     summary:
-      '以定格动画和短片素材补充镜头节奏、逐帧执行、PR/AE 后期和多媒体输出能力。',
-    tags: ['定格动画', 'PR/AE', '多媒体视觉'],
-    role: '完成或参与视频剪辑、分镜/帧画面整理与视觉输出。',
+      '收录《一天》《油泼面》《企鹅》定格动画与《法师的决斗》2D 动画，呈现从分镜、场景制作、逐帧拍摄到剪辑输出的动态创作过程。',
+    tags: ['定格动画', '2D动画', 'PR/AE', '多媒体视觉'],
+    role: '完成定格拍摄、分镜与场景整理，并参与动画制作、视频剪辑和最终输出。',
     evidence: [
-      '定格动画素材能够证明逐帧执行、镜头节奏、场景组织和后期剪辑能力。',
-      '影视后期助理经历补充了现场拍摄、素材整理和项目流程理解。',
+      '《一天》《油泼面》《企鹅》保留成片、分镜、逐帧画面与制作过程资料。',
+      '《法师的决斗》补充 2D 动画中的动作节奏、镜头衔接与后期输出能力。',
     ],
-    outputs: ['定格动画封面', '分镜/内容帧', '视频剪辑素材'],
+    outputs: ['完整动画', '分镜稿', '逐帧画面', '制作过程'],
     relevance:
       '适合 AIGC 视觉、运营视觉、广告素材和多媒体创意方向作为辅助项目。',
     media: [
       {
+        src: '/assets/portfolio/day-stop-motion.mp4',
+        label: '《一天》成片',
+        kind: 'video',
+        poster: '/assets/portfolio/day-stop-motion.webp',
+        captions: '/assets/portfolio/day-stop-motion.zh.vtt',
+      },
+      {
         src: '/assets/portfolio/day-stop-motion.webp',
-        label: '定格动画《一天》',
+        label: '《一天》画面',
       },
       {
         src: '/assets/portfolio/oil-noodles-stop-motion.webp',
-        label: '定格动画《油泼面》',
+        label: '《油泼面》画面',
+      },
+      {
+        src: '/assets/portfolio/oil-noodles-storyboard.png',
+        label: '《油泼面》分镜',
+      },
+      {
+        src: '/assets/portfolio/penguin-stop-motion.jpg',
+        label: '《企鹅》画面',
+      },
+      {
+        src: '/assets/portfolio/penguin-making-of.jpg',
+        label: '《企鹅》制作过程',
+      },
+      {
+        src: '/assets/portfolio/wizard-duel.mp4',
+        label: '《法师的决斗》成片',
+        kind: 'video',
+        captions: '/assets/portfolio/wizard-duel.zh.vtt',
       },
     ],
   },
@@ -253,7 +284,7 @@ export const projects: Project[] = [
 export const resume = {
   education: [
     {
-      time: '2024.09 - 2027.07',
+      time: '2024.09 - 2027.09',
       title: '西安外国语大学｜设计｜硕士在读',
       text: '研究生阶段持续进行设计研究、文化转译、视觉叙事和作品系统化表达。',
     },
@@ -265,19 +296,39 @@ export const resume = {
   ],
   experience: [
     {
-      time: '2022.03 - 2022.08',
-      title: '新东方教育有限公司｜网宣中级 / 运营助教 / 带班助教',
-      text: '参与少儿美术课程助教、课件整理、海报制作、活动执行、摄影与后期修图；曾获大区四月优秀助教。',
+      time: '2026.03 - 2026.07',
+      title: '青芒时代传媒公司｜AI 漫剧制作剪辑',
+      text: '参与 AI 漫剧制作与视频剪辑。',
     },
     {
-      time: '2021.07 - 2021.08',
-      title: '德润文化广告有限公司｜影视后期助理',
+      time: '2025.05 - 2025.09',
+      title: '海纳艺创书画艺术｜教师与宣传',
+      text: '承担书画教学与宣传相关工作。',
+    },
+    {
+      time: '2025.03 - 2025.06',
+      title: '良言喜物｜兼职设计师',
+      text: '承担兼职视觉设计工作。',
+    },
+    {
+      time: '2024.04 - 2026.06',
+      title: '光隙物语工作室｜设计师',
+      text: '负责工作室视觉设计相关工作。',
+    },
+    {
+      time: '2022.03 - 2023.08',
+      title: '新东方教育有限公司｜网络运营与宣传',
+      text: '参与网络运营、宣传物料制作、活动执行、摄影与后期修图。',
+    },
+    {
+      time: '2021.08 - 2021.11',
+      title: '德润广告｜影视后期制作',
       text: '了解广告制作流程，参与策划、分镜、场景、模特选择、拍摄计划与后期素材整理。',
     },
     {
-      time: '2019.07 - 2020.03',
-      title: '西安太乙画室｜素描 / 速写老师',
-      text: '负责约 25 人班级的素描、速写教学、示范、课后辅导和课堂管理。',
+      time: '2019.07 - 2021.06',
+      title: '西安太乙画室｜素描老师',
+      text: '负责素描教学、示范、课后辅导和课堂管理。',
     },
   ],
   skills: [
@@ -303,7 +354,9 @@ export const resume = {
     '2026｜《吉言汉瓦“永受嘉福”文创设计》｜第十七届蓝桥杯视觉艺术设计赛文创设计非命题陕西赛区一等奖',
     '2026｜《唐瑞兽葡萄纹铜镜数字交互展示系统》｜第十七届蓝桥杯视觉艺术设计赛交互设计 UI 非命题陕西赛区三等奖',
     '2026｜《朔·离散》｜米兰设计周中国高校设计学科师生优秀作品展二等奖',
-    '2025｜《青铜御风：方尊巡狩录》｜两岸数字艺术设计三等奖',
+    '2025｜陕西省漆艺大赛三等奖',
+    '2025｜蓝桥杯海报省赛三等奖',
+    '2024｜《青铜驭风》｜两岸艺术设计铜奖',
     '2024｜佳县红润枣业产品包装设计｜陕西高校“双百工程”乡村特色产品创意设计大赛三等奖',
     '普通话二乙｜高中美术教师资格证｜全媒体运营｜心理咨询师',
   ],
