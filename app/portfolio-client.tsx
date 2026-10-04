@@ -2,7 +2,12 @@
 
 /* oxlint-disable next/no-html-link-for-pages next/no-img-element */
 
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+
+import {
+  initPortfolioMotion,
+  preparePortfolioMedia,
+} from '../lib/portfolio-motion';
 
 import { filters, profile, projects } from './portfolio-data';
 
@@ -76,10 +81,24 @@ function matchesFilter(project: (typeof projects)[number], filter: string) {
 }
 
 export default function PortfolioClient() {
+  const rootRef = useRef<HTMLElement>(null);
+  const selectionRequest = useRef(0);
+  const pendingProject = useRef(false);
   const [activeFilter, setActiveFilter] = useState('全部');
   const [selectedId, setSelectedId] = useState(projects[0].id);
   const [activeMedia, setActiveMedia] = useState(0);
   const [showHeader, setShowHeader] = useState(false);
+  const [isProjectLoading, setIsProjectLoading] = useState(false);
+
+  useEffect(() => {
+    if (rootRef.current) return initPortfolioMotion(rootRef.current);
+  }, []);
+
+  useEffect(() => {
+    rootRef.current
+      ?.querySelector('.surface-block')
+      ?.dispatchEvent(new Event('portfolio:media-change'));
+  }, [selectedId, activeMedia]);
 
   useLayoutEffect(() => {
     const previousRestoration = window.history.scrollRestoration;
@@ -134,7 +153,19 @@ export default function PortfolioClient() {
   ];
   const currentMedia = mediaItems[activeMedia] || mediaItems[0];
 
-  function selectProject(id: string) {
+  async function selectProject(id: string) {
+    const request = ++selectionRequest.current;
+    const project = projects.find((item) => item.id === id);
+    if (!project) return;
+    pendingProject.current = true;
+    setIsProjectLoading(true);
+    const media = project.media?.[0];
+    const image =
+      media?.kind === 'video' ? media.poster : media?.src || project.cover;
+    if (image) await preparePortfolioMedia(image);
+    if (request !== selectionRequest.current) return;
+    pendingProject.current = false;
+    setIsProjectLoading(false);
     setSelectedId(id);
     setActiveMedia(0);
   }
@@ -146,13 +177,21 @@ export default function PortfolioClient() {
         ? projects[0]
         : projects.find((project) => matchesFilter(project, filter));
     if (nextProject) {
-      setSelectedId(nextProject.id);
-      setActiveMedia(0);
+      void selectProject(nextProject.id);
     }
   }
 
+  async function selectMedia(index: number) {
+    if (pendingProject.current) return;
+    const request = ++selectionRequest.current;
+    const media = mediaItems[index];
+    const image = media.kind === 'video' ? media.poster : media.src;
+    if (image) await preparePortfolioMedia(image);
+    if (request === selectionRequest.current) setActiveMedia(index);
+  }
+
   return (
-    <main className="portfolio-shell min-h-screen text-[#141414]">
+    <main ref={rootRef} className="portfolio-shell min-h-screen text-[#141414]">
       <header
         className={`site-header fixed top-0 z-30 w-full ${showHeader ? 'site-header--visible' : ''}`}
       >
@@ -185,6 +224,7 @@ export default function PortfolioClient() {
         className="hero-cover relative min-h-svh overflow-hidden"
       >
         <div className="hero-glass-field" aria-hidden="true" />
+        <div className="hero-light" aria-hidden="true" />
         <div className="dust-field" aria-hidden="true">
           {Array.from({ length: 22 }).map((_, index) => (
             <span key={index} />
@@ -260,17 +300,15 @@ export default function PortfolioClient() {
               {visibleProjects.map((project) => (
                 <button
                   key={project.id}
-                  className={`pressable grid grid-cols-[104px_minmax(0,1fr)] gap-4 border p-3 text-left max-sm:grid-cols-1 ${
-                    selectedProject.id === project.id
-                      ? 'rounded-[22px] border-black/18 bg-[#eee7d7]/74 shadow-[0_18px_42px_rgba(0,0,0,0.10)] backdrop-blur-3xl'
-                      : 'rounded-[22px] border-white/26 bg-[#eee7d7]/42 backdrop-blur-2xl hover:border-black/18 hover:bg-[#eee7d7]/62'
-                  }`}
+                  className="project-entry grid grid-cols-[104px_minmax(0,1fr)] gap-4 text-left"
                   type="button"
+                  data-project-id={project.id}
+                  aria-pressed={selectedProject.id === project.id}
                   aria-label={`查看项目：${project.title}`}
                   onClick={() => selectProject(project.id)}
                 >
                   <img
-                    className="h-[92px] w-full rounded-[16px] object-cover max-sm:h-44"
+                    className="h-[92px] w-full rounded-[10px] object-cover"
                     style={{
                       objectPosition: project.coverPosition || '50% 50%',
                     }}
@@ -289,8 +327,11 @@ export default function PortfolioClient() {
               ))}
             </div>
 
-            <article className="surface-block sticky top-24 self-start rounded-[28px] border border-white/32 bg-[#eee7d7]/56 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-3xl max-lg:static">
-              <div className="overflow-hidden rounded-[20px] bg-[#111]">
+            <article
+              aria-busy={isProjectLoading}
+              className="surface-block sticky top-24 self-start rounded-[28px] border border-white/32 bg-[#eee7d7]/56 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-3xl max-lg:static"
+            >
+              <div className="project-media-stage overflow-hidden rounded-[20px] bg-[#111]">
                 {currentMedia.kind === 'video' ? (
                   <video
                     key={currentMedia.src}
@@ -329,15 +370,17 @@ export default function PortfolioClient() {
                           : 'rounded-full border-black/12 bg-[#efefea] text-black/48'
                       }`}
                       type="button"
+                      disabled={isProjectLoading}
+                      aria-pressed={activeMedia === index}
                       aria-label={`查看${item.label}`}
-                      onClick={() => setActiveMedia(index)}
+                      onClick={() => selectMedia(index)}
                     >
                       {item.label}
                     </button>
                   ))}
                 </div>
               )}
-              <div className="mt-6">
+              <div className="project-copy mt-6">
                 <p className="text-xs font-semibold text-[#5f6f5a]">
                   {selectedProject.year} / {selectedProject.category}
                 </p>
@@ -599,7 +642,12 @@ function TimelinePanel() {
           </span>
         </div>
 
-        <div className="timeline-canvas" aria-label="简历时间轴">
+        {/* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- Keyboard users need focus to scroll this region. */}
+        <section
+          className="timeline-canvas"
+          tabIndex={0}
+          aria-label="简历时间轴，可上下滚动"
+        >
           <div className="timeline-final-stage">
             <svg
               className="timeline-final-svg"
@@ -885,7 +933,8 @@ function TimelinePanel() {
               9月
             </span>
           </div>
-        </div>
+        </section>
+        {/* oxlint-enable jsx-a11y/no-noninteractive-tabindex */}
       </div>
     </section>
   );
