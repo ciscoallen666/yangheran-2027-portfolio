@@ -14,6 +14,11 @@
   const filterButtons = Array.from(filterBar?.querySelectorAll('button') || []);
   let selectedProject = projects[0];
   let activeMedia = 0;
+  let selectionRequest = 0;
+  let pendingProject = false;
+  const motion = window.PortfolioMotion;
+  const root = document.querySelector('main');
+  if (root && motion) motion.initPortfolioMotion(root);
 
   const escapeHtml = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -46,16 +51,32 @@
   function setProjectState() {
     projectButtons.forEach((button, index) => {
       const active = projects[index]?.id === selectedProject.id;
-      button.style.background = active
-        ? 'rgba(238,231,215,.74)'
-        : 'rgba(238,231,215,.42)';
-      button.style.borderColor = active
-        ? 'rgba(0,0,0,.18)'
-        : 'rgba(255,255,255,.26)';
-      button.style.boxShadow = active
-        ? '0 18px 42px rgba(0,0,0,.10)'
-        : 'none';
+      button.setAttribute('aria-pressed', String(active));
     });
+  }
+
+  async function selectMedia(project, mediaIndex, projectSelection = false) {
+    if (pendingProject && !projectSelection) return;
+    const request = ++selectionRequest;
+    const changingProject = projectSelection;
+    if (changingProject) {
+      pendingProject = true;
+      article?.setAttribute('aria-busy', 'true');
+      article?.querySelectorAll('[data-media-index]').forEach((button) => { button.disabled = true; });
+    }
+    const mediaItems = project.media?.length
+      ? project.media
+      : [{ src: project.cover, label: project.title }];
+    const nextMedia = Math.min(mediaIndex, mediaItems.length - 1);
+    const item = mediaItems[nextMedia];
+    const image = item.kind === 'video' ? item.poster : item.src;
+    if (motion && image) await motion.preparePortfolioMedia(assetPath(image));
+    if (request !== selectionRequest) return;
+    pendingProject = false;
+    article?.setAttribute('aria-busy', 'false');
+    selectedProject = project;
+    activeMedia = nextMedia;
+    renderProject();
   }
 
   function renderMedia(mediaItems) {
@@ -79,16 +100,16 @@
       : [{ src: selectedProject.cover, label: selectedProject.title }];
     activeMedia = Math.min(activeMedia, mediaItems.length - 1);
     article.innerHTML =
-      '<div class="overflow-hidden rounded-[20px] bg-[#111]">' + renderMedia(mediaItems) + '</div>' +
+      '<div class="project-media-stage overflow-hidden rounded-[20px] bg-[#111]">' + renderMedia(mediaItems) + '</div>' +
       (mediaItems.length > 1
         ? '<div class="mt-3 flex gap-2 overflow-x-auto pb-1">' + mediaItems.map((item, index) =>
             '<button class="min-h-8 shrink-0 border px-3 text-xs rounded-full ' +
             (index === activeMedia ? 'border-black bg-black text-white' : 'border-black/12 bg-[#efefea] text-black/48') +
-            '" type="button" data-media-index="' + index + '" aria-label="查看' + escapeHtml(item.label) + '">' +
+            '" type="button" data-media-index="' + index + '" aria-pressed="' + (index === activeMedia) + '" aria-label="查看' + escapeHtml(item.label) + '">' +
             escapeHtml(item.label) + '</button>'
           ).join('') + '</div>'
         : '') +
-      '<div class="mt-6">' +
+      '<div class="project-copy mt-6">' +
         '<p class="text-xs font-semibold text-[#5f6f5a]">' + escapeHtml(selectedProject.year) + ' / ' + escapeHtml(selectedProject.category) + '</p>' +
         '<div class="project-title-row">' +
           '<h3 class="text-3xl font-black leading-tight tracking-normal text-black/88 max-md:text-2xl">' + escapeHtml(selectedProject.title) + '</h3>' +
@@ -102,18 +123,16 @@
 
     article.querySelectorAll('[data-media-index]').forEach((button) => {
       button.addEventListener('click', () => {
-        activeMedia = Number(button.dataset.mediaIndex);
-        renderProject();
+        void selectMedia(selectedProject, Number(button.dataset.mediaIndex));
       });
     });
     setProjectState();
+    article.dispatchEvent(new Event('portfolio:media-change'));
   }
 
   projectButtons.forEach((button, index) => {
     button.addEventListener('click', () => {
-      selectedProject = projects[index];
-      activeMedia = 0;
-      renderProject();
+      void selectMedia(projects[index], 0, true);
     });
   });
 
@@ -123,10 +142,9 @@
       projectButtons.forEach((projectButton, index) => {
         projectButton.hidden = !matchesFilter(projects[index], filter);
       });
-      selectedProject = projects.find((project) => matchesFilter(project, filter)) || projects[0];
-      activeMedia = 0;
+      const nextProject = projects.find((project) => matchesFilter(project, filter)) || projects[0];
       setFilterState(filter);
-      renderProject();
+      void selectMedia(nextProject, 0, true);
     });
   });
 
